@@ -370,10 +370,26 @@ for b in sms:smsBios gg:ggBios; do
 	fi
 	wd="$(workdir "bios.$sys" "$sys" "{\"system\":\"$sys\",\"bios\":true}")"
 	cp "$fw" "$wd/$id"
-	if msg="$(equal_runs "bios.$sys" "$wd" --sys "$sys" --frames 900 --exercise)"; then
-		report "bios:$sys" PASS "900 frames through the boot ROM, native == sandbox (sha1 $(sha1sum "$fw" | cut -c1-12))"
+	sha="$(sha1sum "$fw" | cut -c1-12)"
+	if ! msg="$(equal_runs "bios.$sys" "$wd" --sys "$sys" --frames 900 --exercise)"; then
+		report "bios:$sys" FAIL "$msg"; continue
+	fi
+	if ! "$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 900 --exercise --rerecord 2>/dev/null | digests | cmp -s - "$work/bios.$sys.box"; then
+		report "bios:$sys" FAIL "a save and a load before every frame changed the run"; continue
+	fi
+	# the boot ROM really ran (the machine is not the one without it), and
+	# then handed over to the cartridge (its frame counter, at 0xC100, moves)
+	nwd="$(workdir "nobios.$sys" "$sys" "{\"system\":\"$sys\"}")"
+	"$nat/run-wbx" "$gst/core.wbx" "$nwd" --sys "$sys" --frames 900 --dump-domain "Main RAM" "$work/nb.ram" >/dev/null 2>&1
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 900 --dump-domain "Main RAM" "$work/b900.ram" >/dev/null 2>&1
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 890 --dump-domain "Main RAM" "$work/b890.ram" >/dev/null 2>&1
+	f900="$(ram_byte "$work/b900.ram" 0x100 2>/dev/null)"; f890="$(ram_byte "$work/b890.ram" 0x100 2>/dev/null)"
+	if cmp -s "$work/nb.ram" "$work/b900.ram"; then
+		report "bios:$sys" FAIL "the machine with the boot ROM is the one without it (sha1 $sha)"
+	elif [ -z "$f900" ] || [ "$f900" = "$f890" ]; then
+		report "bios:$sys" FAIL "the boot ROM did not hand over to the cartridge (sha1 $sha)"
 	else
-		report "bios:$sys" FAIL "$msg"
+		report "bios:$sys" PASS "900 frames through the boot ROM (sha1 $sha) into the cartridge, native == sandbox == save and load every frame"
 	fi
 done
 

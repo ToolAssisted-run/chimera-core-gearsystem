@@ -414,6 +414,12 @@ static int load_console(int i)
 	g_cores[i] = core;
 	/* a linked console draws into upstream's 16-bit instance buffer */
 	core->Init(linked() ? GS_PIXEL_RGB565 : GS_PIXEL_BGRA8888);
+	/* The game is a cartridge, in the cartridge slot: what a boot ROM finds
+	 * when it looks. Upstream's desktop program says so (its Media Slot
+	 * setting, Cartridge by default); left alone, Memory keeps it in the
+	 * expansion slot, which a Game Gear does not have, and the Game Gear's
+	 * boot ROM then hands over to nothing. */
+	core->GetMemory()->SetMediaSlot(Memory::CartridgeSlot);
 	apply_machine_settings(core);
 	if (!load_bios(core))
 		return 0;

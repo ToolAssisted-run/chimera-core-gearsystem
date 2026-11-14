@@ -184,9 +184,6 @@ sprite-collision or overflow timing. Real games are the test for those.
 
 ## Not done
 
-- **The boot ROMs** were not run: none is on this machine. The tests that
-  run them are in `run-gate.sh` and say SKIP until `tests/firmware-local`
-  holds `smsBios` or `ggBios`.
 - **Windows and aarch64** were not run here; CI builds aarch64, and the
   package declares both CPUs. A movie recorded in the window and replayed in
   a new process on Windows is still to be done.
@@ -297,3 +294,59 @@ Gear 30 bytes, Mark III 143 reads, in 300 frames). Seen to fail with the
 fallback taken out (both machines: `error.no_file`). The window test now
 makes its link projects with P2's slot empty: 14 passed. Contract tests: 25
 passed.
+
+## 2026-11-14: the owner's boot ROMs and games
+
+The owner's firmware and games arrived on jaffanator01 (copied into the
+gitignored `tests/firmware-local` and `tests/roms-local`, never linked).
+
+**A fix the Game Gear boot ROM needed.** Upstream keeps the game in the
+expansion slot unless its program is told otherwise (`Memory`'s stored media
+slot starts as `ExpansionSlot`; its desktop program sets Cartridge from its
+Media Slot setting, its libretro core never sets it). A Master System's boot
+ROM looks in every slot and found it; a Game Gear has no expansion slot, so
+its boot ROM showed its licence screen and handed over to nothing (the Z80
+ran `RST 38` on empty memory forever). The core now puts the game in the
+cartridge slot, as the desktop program does by default. `bios:gg` failed
+before the fix and passes after; `bios:sms` passes both ways.
+
+The boot ROM tests got stronger at the same time: besides native ==
+sandbox, a save and a load every frame must change nothing, the machine must
+not be the one without the boot ROM, and the cartridge's frame counter must
+move at the end (the boot ROM handed over). `run-gate.sh`: 57 passed, 0
+failed, 0 skipped, with `SMS_us_1.3.sms` (sha1
+c315672807d8ddb8d91443729405c766dd95cae7) and `GG_majesco.gg` (sha1
+914aa165e3d879f060be77870d345b60cfeb4ede; "[BIOS] Sega Game Gear (USA)
+(Majesco).gg" is the same file). The other Master System boot ROMs, 1200
+frames each into the test cartridge and Galactic Protector: US 1.0b
+(29091ff60ef4...), Japan 2.1 (a8c1b39a2e41...) and Korea (2feafd8f1c40...)
+hand over and the games read their controls; the M404 prototype
+(4a06c8e66261...) shows its logo and never hands over, with either
+cartridge (not investigated further; real hardware not compared). The boot
+ROMs stay optional and unpinned: several dumps work.
+
+**Games**, 3000 frames each with a scripted schedule of presses (`--inputs`),
+native == sandbox == a save and a load before every frame, all seven:
+
+- Master System: Galactic Protector (Japan) on the Paddle Control
+  (e8bcc362...) and Mai Nurse 1.00 (homebrew, 770a8b57...). Galactic
+  Protector with the region on automatic (upstream's game list makes it a
+  Japanese console) and no boot ROM crashes at power-on: the Z80 runs off
+  into garbage within a second, never reading its controls. With region
+  Export, or with the Japanese boot ROM, it starts and plays: round 1 with
+  the paddle's knob moving the ship, and with the boot ROM played through
+  to Game Over. This is upstream's emulation (the same code path its
+  libretro core takes); upstream itself was not run to confirm it. Mai
+  Nurse reached its tutorial screen.
+- Game Gear: Frogger (prototype) in play; Nazo Puyo: Aruru no Ru in play
+  (the map and its dialogue); with the Game Gear boot ROM, Frogger reaches
+  its title after the licence screen.
+- SG-1000: Monaco GP (Japan, bea768b2...) in play, level 2 with a score;
+  Pitman (22b6c05f...) in play, at round 24 after 3000 frames; Foryster
+  (homebrew, 6d9ed720...) played a level and was back on its title by
+  frame 3000 (game over).
+
+**No Gear-to-Gear game** is in the owner's Game Gear folder (Frogger, Nazo
+Puyo and Prince of Persia, which is a Master System game), and no Mark III
+link game, so no real two-player game over a cable was played; the cables
+are proved by this repository's own test cartridges only.
