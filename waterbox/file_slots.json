@@ -1,0 +1,41 @@
+{
+  "_comment": "This file lists the kinds of file a project of this core can hold. Chimera's New Project window is built from it. The core is three machines and each takes its own cartridges, so each has its own slot, and only the slot of the chosen machine is shown (the exposedWhen conditions do this). The machine comes from the project, never from a file name. A project may also hold a save of the cartridge's battery RAM, as Export Save Data writes it, to start from.",
+  "slots": [
+    {
+      "id": "cart_sms",
+      "title": "slot.cart",
+      "min": 1,
+      "max": 1,
+      "formats": ["sms", "bin", "rom"],
+      "help": "slot.cart_sms.help",
+      "exposedWhen": { "setting": "system", "is": "sms" }
+    },
+    {
+      "id": "cart_gg",
+      "title": "slot.cart",
+      "min": 1,
+      "max": 1,
+      "formats": ["gg", "sms", "bin", "rom"],
+      "help": "slot.cart_gg.help",
+      "exposedWhen": { "setting": "system", "is": "gg" }
+    },
+    {
+      "id": "cart_sg",
+      "title": "slot.cart",
+      "min": 1,
+      "max": 1,
+      "formats": ["sg", "sc", "mv", "bin", "rom"],
+      "help": "slot.cart_sg.help",
+      "exposedWhen": { "setting": "system", "is": "sg1000" }
+    },
+    {
+      "id": "savedata",
+      "title": "slot.savedata",
+      "min": 0,
+      "max": 1,
+      "formats": ["sav"],
+      "help": "slot.savedata.help",
+      "exposedWhen": { "not": { "setting": "system", "is": "sg1000" } }
+    }
+  ]
+}

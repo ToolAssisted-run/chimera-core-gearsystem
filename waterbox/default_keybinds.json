@@ -1,0 +1,46 @@
+{
+  "_comment": [
+    "Default bindings for the controllers this package declares, one section per machine.",
+    "Only player 1 is bound: a second pad is something you plug in deliberately. The Light",
+    "Phaser and the Paddle follow the mouse over the picture. The user's own bindings always win."
+  ],
+  "AllTrollers": {
+    "Master System Controller": {
+      "P1 Up": "Up, J1 POV0U, X1 DpadUp, X1 LStickUp",
+      "P1 Down": "Down, J1 POV0D, X1 DpadDown, X1 LStickDown",
+      "P1 Left": "Left, J1 POV0L, X1 DpadLeft, X1 LStickLeft",
+      "P1 Right": "Right, J1 POV0R, X1 DpadRight, X1 LStickRight",
+      "P1 Button 1": "Z, J1 B1, X1 X",
+      "P1 Button 2": "X, J1 B2, X1 A",
+      "Reset": "J1 B9, X1 Back",
+      "Pause": "Enter, J1 B10, X1 Start"
+    },
+    "Game Gear Controller": {
+      "P1 Up": "Up, J1 POV0U, X1 DpadUp, X1 LStickUp",
+      "P1 Down": "Down, J1 POV0D, X1 DpadDown, X1 LStickDown",
+      "P1 Left": "Left, J1 POV0L, X1 DpadLeft, X1 LStickLeft",
+      "P1 Right": "Right, J1 POV0R, X1 DpadRight, X1 LStickRight",
+      "P1 Button 1": "Z, J1 B1, X1 X",
+      "P1 Button 2": "X, J1 B2, X1 A",
+      "P1 Start": "Enter, J1 B10, X1 Start"
+    },
+    "SG-1000 Controller": {
+      "P1 Up": "Up, J1 POV0U, X1 DpadUp, X1 LStickUp",
+      "P1 Down": "Down, J1 POV0D, X1 DpadDown, X1 LStickDown",
+      "P1 Left": "Left, J1 POV0L, X1 DpadLeft, X1 LStickLeft",
+      "P1 Right": "Right, J1 POV0R, X1 DpadRight, X1 LStickRight",
+      "P1 Button 1": "Z, J1 B1, X1 X",
+      "P1 Button 2": "X, J1 B2, X1 A",
+      "Pause": "Enter, J1 B10, X1 Start"
+    }
+  },
+  "AllTrollersAnalog": {
+    "Master System Controller": {
+      "P1 Light Phaser X": { "Value": "WMouse X", "Mult": 1.0, "Deadzone": 0.0 },
+      "P1 Light Phaser Y": { "Value": "WMouse Y", "Mult": 1.0, "Deadzone": 0.0 },
+      "P1 Paddle": { "Value": "WMouse X", "Mult": 1.0, "Deadzone": 0.0 },
+      "P1 Sports Pad X": { "Value": "X1 RightThumbX Axis", "Mult": 1.0, "Deadzone": 0.0 },
+      "P1 Sports Pad Y": { "Value": "X1 RightThumbY Axis", "Mult": 1.0, "Deadzone": 0.0 }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+[submodule "extern/Gearsystem"]
+	path = extern/Gearsystem
+	url = https://github.com/drhelius/Gearsystem.git
+	shallow = true

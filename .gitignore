@@ -1,0 +1,5 @@
+/build/
+/tests/roms-local/
+/waterbox/tests/work/
+__pycache__/
+/tests/firmware-local/

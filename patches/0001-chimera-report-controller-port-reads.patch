@@ -1,0 +1,44 @@
+diff --git a/src/Input.h b/src/Input.h
+index bf30066..c3e2bfa 100644
+--- a/src/Input.h
++++ b/src/Input.h
+@@ -22,6 +22,15 @@
+ 
+ #include "definitions.h"
+ 
++/* Chimera: each read of the controller ports is reported to the adapter
++ * (lag frames, and Lua's event.oninputpoll). Off unless the build asks. */
++#if defined(CHIMERA_INPUT_HOOK)
++void chimera_input_read(void);
++#define CHIMERA_INPUT_READ() chimera_input_read()
++#else
++#define CHIMERA_INPUT_READ() ((void)0)
++#endif
++
+ class Memory;
+ class Processor;
+ class Video;
+@@ -162,6 +171,7 @@ INLINE u8 Input::GetControllerPort(u8 port)
+ 
+ inline u8 Input::GetPortDC()
+ {
++    CHIMERA_INPUT_READ();
+     if (m_bPhaser && !m_bGameGear)
+     {
+         return (m_Joypad1 & Key_1) ? 0xFF : 0xEF;
+@@ -176,6 +186,7 @@ inline u8 Input::GetPortDC()
+ 
+ inline u8 Input::GetPortDD()
+ {
++    CHIMERA_INPUT_READ();
+     u8 dd;
+     if (m_bPhaser && !m_bGameGear)
+     {
+@@ -197,6 +208,7 @@ inline u8 Input::GetPortDD()
+ 
+ inline u8 Input::GetPort00()
+ {
++    CHIMERA_INPUT_READ();
+     return m_Joypad1 & Key_Start;
+ }
+ 
