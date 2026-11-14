@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Opstarts-ROM'en '%1' mangler eller kunne ikke læses.",
+		"error.link_refused": "'%1' kan ikke bruge denne maskines linkkabel.",
 		"error.no_file": "Projektet indeholder ingen modulfil.",
 		"error.not_read": "Kunne ikke læse '%1'.",
 		"error.rejected": "Gearsystem kunne ikke indlæse '%1' som modul.",
@@ -20,10 +21,12 @@
 		"option.full284": "Alle sider (284 bred)",
 		"option.full320": "Alle sider (320 bred)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (to konsoller)",
 		"option.international": "International",
 		"option.japan": "Japan",
 		"option.left": "Venstre øje",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (to konsoller)",
 		"option.no": "Nej",
 		"option.none": "Intet",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-lydchip",
 		"setting.ym2413.about": "FM-lydenheden YM2413, som nogle Master System-spil bruger til musikken. Fra tager den ud af maskinen. Den er en del af maskinen, så en film skal have samme værdi.",
 		"slot.cart": "Modul",
+		"slot.cart2": "P2's modul",
 		"slot.cart_gg.help": "ROM'en fra et Game Gear-modul. Et Master System-modul her kører i Game Gears Master System-tilstand.",
+		"slot.cart_gg2.help": "ROM'en fra P2's Game Gear-modul, til konsollen til højre.",
 		"slot.cart_sg.help": "ROM'en fra et SG-1000-, SG-1000 II- eller Othello Multivision-modul.",
 		"slot.cart_sms.help": "ROM'en fra et Master System- eller Mark III-modul.",
+		"slot.cart_sms2.help": "ROM'en fra P2's Mark III-modul, til konsollen til højre.",
 		"slot.savedata": "Gemte data",
-		"slot.savedata.help": "Modulets batteri-RAM, som Eksportér gemte data skrev det (battery.sav), at starte spillet fra. Lad den være tom for at starte uden gemt spil."
+		"slot.savedata.help": "Modulets batteri-RAM, som Eksportér gemte data skrev det (battery.sav), at starte spillet fra. Lad den være tom for at starte uden gemt spil.",
+		"slot.savedata2": "P2's gemte data",
+		"slot.savedata2.help": "Batteri-RAM'en i P2's modul, som Eksportér gemte data skrev den (battery2.sav), at starte fra. Lad den være tom for at starte uden gemt spil."
 	}
 }

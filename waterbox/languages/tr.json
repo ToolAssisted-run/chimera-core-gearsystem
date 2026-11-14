@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Önyükleme ROM'u '%1' eksik ya da okunamadı.",
+		"error.link_refused": "'%1' bu makinenin bağlantı kablosunu kullanamaz.",
 		"error.no_file": "Projede kartuş dosyası yok.",
 		"error.not_read": "'%1' okunamadı.",
 		"error.rejected": "Gearsystem '%1' dosyasını kartuş olarak yükleyemedi.",
@@ -20,10 +21,12 @@
 		"option.full284": "Her yan (284 genişlik)",
 		"option.full320": "Her yan (320 genişlik)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (iki konsol)",
 		"option.international": "Uluslararası",
 		"option.japan": "Japonya",
 		"option.left": "Sol göz",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (iki konsol)",
 		"option.no": "Hayır",
 		"option.none": "Hiçbir şey",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM ses yongası",
 		"setting.ym2413.about": "Bazı Master System oyunlarının müzik için kullandığı YM2413 FM ses birimi. Kapalı onu makineden çıkarır. Makinenin bir parçasıdır, bu yüzden bir film aynı değere ihtiyaç duyar.",
 		"slot.cart": "Kartuş",
+		"slot.cart2": "P2'nin kartuşu",
 		"slot.cart_gg.help": "Bir Game Gear kartuşunun ROM'u. Buradaki bir Master System kartuşu Game Gear'ın Master System kipinde çalışır.",
+		"slot.cart_gg2.help": "P2'nin Game Gear kartuşunun ROM'u, sağdaki konsol için.",
 		"slot.cart_sg.help": "Bir SG-1000, SG-1000 II ya da Othello Multivision kartuşunun ROM'u.",
 		"slot.cart_sms.help": "Bir Master System ya da Mark III kartuşunun ROM'u.",
+		"slot.cart_sms2.help": "P2'nin Mark III kartuşunun ROM'u, sağdaki konsol için.",
 		"slot.savedata": "Kayıt verisi",
-		"slot.savedata.help": "Kayıt Verisini Dışa Aktar'ın yazdığı biçimde kartuşun pilli RAM'i (battery.sav); oyun buradan başlar. Kayıtsız başlamak için boş bırakın."
+		"slot.savedata.help": "Kayıt Verisini Dışa Aktar'ın yazdığı biçimde kartuşun pilli RAM'i (battery.sav); oyun buradan başlar. Kayıtsız başlamak için boş bırakın.",
+		"slot.savedata2": "P2'nin kayıt verisi",
+		"slot.savedata2.help": "Kayıt Verisini Dışa Aktar'ın yazdığı biçimde P2'nin kartuşunun pilli RAM'i (battery2.sav); oradan başlanır. Kayıtsız başlamak için boş bırakın."
 	}
 }

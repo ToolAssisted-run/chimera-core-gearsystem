@@ -21,14 +21,11 @@ each decision with what was measured. Dated entries, newest last.
   with its source, which the package names (its `licenses/` folder and
   `build.json`). Files inside with their own terms: Shay Green's sound
   buffers (LGPL-2.1 or later and GPL-2.0 or later) and miniz (MIT), both
-  compatible. **One open question for the owner:** the YM2413 (FM sound)
-  emulation, `src/audio/emu2413/emu2413.c`, is Jarek Burczynski's
-  `ym2413.c` with Eke-Eke's changes from Genesis Plus GX. The file states no
-  licence. Genesis Plus GX ships it under its own non-commercial terms;
-  MAME ships the original author's code under GPL-2.0 or later. The package
-  is therefore marked "commercial use prohibited" in
-  `waterbox/package-licenses.json` until the owner says otherwise. It does
-  not stop the non-commercial distribution Chimera does.
+  compatible. The YM2413 (FM sound) emulation,
+  `src/audio/emu2413/emu2413.c`, is Jarek Burczynski's `ym2413.c` with
+  Eke-Eke's changes from Genesis Plus GX; the file states no licence of its
+  own. The owner decided how it is declared (see the log, 2026-11-14,
+  "The FM chip's terms").
 - **One thread, one clock?** Yes. Gearsystem is single-threaded; a frame is
   `RunToVBlank`, which runs the Z80 until the video chip reaches its vertical
   blank. Time is counted in the machine's own cycles. The only host-time
@@ -187,10 +184,6 @@ sprite-collision or overflow timing. Real games are the test for those.
 
 ## Not done
 
-- **The link cables** (Gear-to-Gear, Mark III Joy-Joy): they join two
-  consoles. Upstream's libretro core runs two emulators in one process for
-  it; a core could do the same, but it is a second machine in one project
-  and was left out of this first version.
 - **The boot ROMs** were not run: none is on this machine. The tests that
   run them are in `run-gate.sh` and say SKIP until `tests/firmware-local`
   holds `smsBios` or `ggBios`.
@@ -198,3 +191,91 @@ sprite-collision or overflow timing. Real games are the test for those.
   package declares both CPUs. A movie recorded in the window and replayed in
   a new process on Windows is still to be done.
 - **Registers can be read, not written**; no bus, no memory callbacks.
+
+## 2026-11-14: The FM chip's terms (user-decided, 2026-11-14)
+
+The owner's decision: the FM chip stays, and the package is declared
+non-commercial the way the gpgx core declares Genesis Plus GX's terms.
+`waterbox/package-licenses.json` now says the YM2413 emulation is under
+"Genesis Plus GX licence (non-commercial), with MAME parts", and its note
+says, in gpgx's words, that this code "is free for NON-COMMERCIAL use only"
+and that "the package as a whole therefore may not be redistributed
+commercially". `LICENSE` says the same.
+
+## 2026-11-14: The link cables, inside the core (user-decided, 2026-11-14)
+
+The owner's words: "No need to change this at a chimera level. Each core
+should be able to do the replication at the core level and expose this as
+a single machine to Chimera." The gambatte core's Game Boy Link (system GBL)
+was the model for the shape.
+
+- **Two machines more**, values of the Machine setting: `ggLink`, system
+  GGL ("Game Gear Link (two)", BizHawk's id for it), two Game Gears joined
+  by the Gear-to-Gear cable; and `markIIILink`, system M3L ("Mark III Link
+  (two)"), two Mark IIIs joined by the Joy-Joy cable, which plugs into the
+  SK-1100 keyboard (only F-16 Fighting Falcon, Japan, used it). Gearsystem
+  emulates both cables.
+- **How the two run**: upstream's own scheduler for its libretro core's
+  link, `LibretroLink` in `platforms/libretro/libretro_link.cpp`, compiled
+  unchanged but for one patch (0003) that lets it plug in the Mark III cable
+  as well as the Gear-to-Gear one. It runs the console that is behind for
+  one instruction at a time; what one console puts on the wires reaches the
+  other at the cycle it was put there. A frame is a fixed number of cycles
+  (262 or 313 lines), so a link machine's frames do not end at a picture.
+  Both consoles live in the one sandbox, so a savestate holds both and the
+  cable between them; upstream's own link savestate code is not used.
+- **What Chimera sees**: one machine. The picture is P1's beside P2's
+  (320x144, or 512x192 for two Mark IIIs; the border setting does not apply);
+  the sound is the two mixed, as upstream mixes them. The controls: one
+  Power (both consoles restart and the cable is plugged in again, upstream's
+  reset), then each console's: a Game Gear's pad and Start; a Mark III's
+  Reset, Pause, pad and the four keyboard keys that game reads (1, 2, Space,
+  Return). Memory domains are each console's, P2's named "P2 Main RAM" and
+  so on. Save data: battery.sav and battery2.sav, and the slots `savedata`
+  and `savedata2` to start from them.
+- **Files**: a second cartridge slot, `cart_gg2` or `cart_sms2`. A project
+  lists a file once, so playing the same game on both consoles takes a copy
+  under another name.
+- **Settings**: shared by both consoles. A Game Gear Link runs its
+  consoles natively (the cable is the native mode's) and refuses a
+  cartridge that is not a Game Gear one; a Mark III Link is a Japanese
+  console. A cartridge the cable does not work with is refused with
+  `error.link_refused`.
+- **The keyboard's reads are control reads** (patch 0002), so a frame in
+  which a Mark III read only its keyboard is not a lag frame. A link
+  machine's frame is a lag frame when neither console read its controls.
+
+The test cartridges grew a link mode (`tests/make-roms.py` writes
+`gslink.gg` and `gslink.sms`): the Game Gear one sends its checksum over the
+serial port whenever the line is free and counts the bytes it receives; the
+Mark III one puts two bits of its checksum on the cable's two lines through
+the keyboard's PPI and counts the reads that saw the other console pull one
+low. Each folds what it received into its checksum, so what one console's
+pad does reaches the other's memory only through the cable.
+
+Measured (jaffanator01): `run-gate.sh` 53 passed, 0 failed, 2 skipped (the
+boot ROMs). For each link machine, 600 frames with every control pressed in
+a fixed pattern: native == sandbox, the same with a save and a load before
+every frame, turbo, Power; in 300 frames P1 and P2 each received over the
+cable (Game Gear: 30 bytes each; Mark III: 143 reads each saw a line low)
+while the same cartridge on one console alone received nothing; P2's button
+held changes P1's memory; lag frames between 1 and 300 of 600 (14 on the
+Mark III Link, whose consoles read on alternate frames of their own, 307 on
+the Game Gear Link). A Master System cartridge in a Game Gear Link is
+refused. Seen to fail: the cable left unplugged (the exchange and the
+crossing tests of both machines, 4 failures), P2's controls taken from P1's
+place on the wire (the crossing test of both, 2 failures), and the refusal
+before it was written (it failed first, which is how it was found).
+Chimera's contract tests: 25 passed. `run-frontend.sh`: 14 passed; in the
+window each link machine's P1 RAM is the native reference's after 300
+frames and shows bytes received over the cable, and both link controllers'
+key bindings are the package's.
+
+Games: no Gear-to-Gear game is in the owner's collection on jaffanator01 yet
+(only Frogger, a prototype, and Nazo Puyo: Aruru no Ru, neither known to use
+the cable), and no Mark III game at all. Each of the two was run on the Game
+Gear Link with itself, 3600 frames with the controls pressed in a fixed
+pattern (`run-local.sh --link`): native == sandbox == a save and load every
+frame. Columns, Sonic 2's two-player mode and F-16 Fighting Falcon were not
+tried: they are not on the machine. So no game has been played over the
+cable here; only the test cartridges prove the cable.

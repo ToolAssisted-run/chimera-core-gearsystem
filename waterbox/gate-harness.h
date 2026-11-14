@@ -9,6 +9,9 @@
  *   sms: 15 buttons (Power, Reset, Pause, P1 x6, P2 x6) and 7 axes
  *   gg:   8 buttons (Power, P1 x6, P1 Start)
  *   sg:  14 buttons (Power, Pause, P1 x6, P2 x6)
+ *   gglink: 15 buttons (Power, then each Game Gear's pad and Start)
+ *   m3link: 25 buttons (Power, then each Mark III's Reset, Pause, pad and
+ *           four keyboard keys)
  * Button 0 is Power on every machine; the exercise never presses it.
  */
 #ifndef GATE_HARNESS_H
@@ -19,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define GATE_MAX_BUTTONS 16
+#define GATE_MAX_BUTTONS 32
 #define GATE_AXES 7
 
 struct gate_core
@@ -69,7 +72,8 @@ static int gate_button_count(const char *sys)
 {
 	if (!strcmp(sys, "gg")) return 8;
 	if (!strcmp(sys, "sg")) return 14;
-	return 15;
+	if (!strcmp(sys, "m3link")) return 25;
+	return 15; /* sms, gglink */
 }
 
 static uint64_t gate_fnv(uint64_t h, const void *p, size_t n)
@@ -150,9 +154,8 @@ static int gate_run(const struct gate_core *c, const struct gate_opts *o)
 		for (int a = 0; a < GATE_AXES; a++) axes[a] = 32768;
 		if (o->exercise)
 		{
-			uint64_t x = gate_mix((uint64_t)f);
 			for (int k = 1; k < nb; k++)
-				buttons[k] = (x >> (k * 3)) & 1;
+				buttons[k] = (gate_mix((uint64_t)f * 64 + (uint64_t)k) >> 17) & 1;
 		}
 		if (o->wiggleAxes)
 		{
@@ -285,9 +288,10 @@ static int gate_parse_opts(int argc, char **argv, int first, struct gate_opts *o
 		else if (!strcmp(argv[i], "--rerecord")) ; /* run-wbx's own */
 		else { fprintf(stderr, "unknown argument %s\n", argv[i]); return 0; }
 	}
-	if (strcmp(o->sys, "sms") && strcmp(o->sys, "gg") && strcmp(o->sys, "sg"))
+	if (strcmp(o->sys, "sms") && strcmp(o->sys, "gg") && strcmp(o->sys, "sg")
+		&& strcmp(o->sys, "gglink") && strcmp(o->sys, "m3link"))
 	{
-		fprintf(stderr, "--sys is sms, gg or sg\n");
+		fprintf(stderr, "--sys is sms, gg, sg, gglink or m3link\n");
 		return 0;
 	}
 	return 1;

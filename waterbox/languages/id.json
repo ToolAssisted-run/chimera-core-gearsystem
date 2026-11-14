@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "ROM boot '%1' tidak ada atau tidak dapat dibaca.",
+		"error.link_refused": "'%1' tidak dapat memakai kabel penghubung mesin ini.",
 		"error.no_file": "Proyek tidak berisi berkas kartrid.",
 		"error.not_read": "Tidak dapat membaca '%1'.",
 		"error.rejected": "Gearsystem tidak dapat memuat '%1' sebagai kartrid.",
@@ -20,10 +21,12 @@
 		"option.full284": "Semua sisi (lebar 284)",
 		"option.full320": "Semua sisi (lebar 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (dua konsol)",
 		"option.international": "Internasional",
 		"option.japan": "Jepang",
 		"option.left": "Mata kiri",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (dua konsol)",
 		"option.no": "Tidak",
 		"option.none": "Tidak ada",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Cip suara FM",
 		"setting.ym2413.about": "Unit suara FM YM2413, yang dipakai beberapa permainan Master System untuk musiknya. Mati mengeluarkannya dari mesin. Ini bagian dari mesin, jadi sebuah film membutuhkan nilai yang sama.",
 		"slot.cart": "Kartrid",
+		"slot.cart2": "Kartrid P2",
 		"slot.cart_gg.help": "ROM kartrid Game Gear. Kartrid Master System di sini berjalan dalam mode Master System milik Game Gear.",
+		"slot.cart_gg2.help": "ROM kartrid Game Gear milik P2, untuk konsol di kanan.",
 		"slot.cart_sg.help": "ROM kartrid SG-1000, SG-1000 II, atau Othello Multivision.",
 		"slot.cart_sms.help": "ROM kartrid Master System atau Mark III.",
+		"slot.cart_sms2.help": "ROM kartrid Mark III milik P2, untuk konsol di kanan.",
 		"slot.savedata": "Data simpanan",
-		"slot.savedata.help": "RAM berbaterai kartrid seperti yang ditulis Ekspor Data Simpanan (battery.sav), untuk memulai permainan darinya. Biarkan kosong untuk mulai tanpa simpanan."
+		"slot.savedata.help": "RAM berbaterai kartrid seperti yang ditulis Ekspor Data Simpanan (battery.sav), untuk memulai permainan darinya. Biarkan kosong untuk mulai tanpa simpanan.",
+		"slot.savedata2": "Data simpanan P2",
+		"slot.savedata2.help": "RAM berbaterai kartrid P2 seperti yang ditulis Ekspor Data Simpanan (battery2.sav), untuk memulai darinya. Biarkan kosong untuk mulai tanpa simpanan."
 	}
 }

@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Завантажувальний ROM '%1' відсутній або не читається.",
+		"error.link_refused": "'%1' не може використовувати кабель зв'язку цієї машини.",
 		"error.no_file": "У проєкті немає файлу картриджа.",
 		"error.not_read": "Не вдалося прочитати '%1'.",
 		"error.rejected": "Gearsystem не зміг завантажити '%1' як картридж.",
@@ -20,10 +21,12 @@
 		"option.full284": "Усі боки (ширина 284)",
 		"option.full320": "Усі боки (ширина 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (дві консолі)",
 		"option.international": "Міжнародний",
 		"option.japan": "Японія",
 		"option.left": "Ліве око",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (дві консолі)",
 		"option.no": "Ні",
 		"option.none": "Нічого",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Звуковий чип FM",
 		"setting.ym2413.about": "Звуковий блок FM YM2413, який деякі ігри Master System використовують для музики. Вимк. прибирає його з машини. Це частина машини, тож фільму потрібне те саме значення.",
 		"slot.cart": "Картридж",
+		"slot.cart2": "Картридж P2",
 		"slot.cart_gg.help": "ROM картриджа Game Gear. Картридж Master System тут працює в режимі Master System консолі Game Gear.",
+		"slot.cart_gg2.help": "ROM картриджа Game Gear гравця P2, для правої консолі.",
 		"slot.cart_sg.help": "ROM картриджа SG-1000, SG-1000 II або Othello Multivision.",
 		"slot.cart_sms.help": "ROM картриджа Master System або Mark III.",
+		"slot.cart_sms2.help": "ROM картриджа Mark III гравця P2, для правої консолі.",
 		"slot.savedata": "Збережені дані",
-		"slot.savedata.help": "RAM картриджа з батарейкою у вигляді, записаному Експортом збережених даних (battery.sav), щоб почати гру з неї. Залиште порожнім, щоб почати без збереження."
+		"slot.savedata.help": "RAM картриджа з батарейкою у вигляді, записаному Експортом збережених даних (battery.sav), щоб почати гру з неї. Залиште порожнім, щоб почати без збереження.",
+		"slot.savedata2": "Збережені дані P2",
+		"slot.savedata2.help": "RAM з батарейкою картриджа P2 у вигляді, записаному Експортом збережених даних (battery2.sav), щоб почати з неї. Залиште порожнім, щоб почати без збереження."
 	}
 }

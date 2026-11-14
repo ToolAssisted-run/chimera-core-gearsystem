@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Das Boot-ROM '%1' fehlt oder konnte nicht gelesen werden.",
+		"error.link_refused": "'%1' kann das Linkkabel dieser Maschine nicht nutzen.",
 		"error.no_file": "Das Projekt enthält keine Moduldatei.",
 		"error.not_read": "'%1' konnte nicht gelesen werden.",
 		"error.rejected": "Gearsystem konnte '%1' nicht als Modul laden.",
@@ -20,10 +21,12 @@
 		"option.full284": "Alle Seiten (284 breit)",
 		"option.full320": "Alle Seiten (320 breit)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (zwei Konsolen)",
 		"option.international": "International",
 		"option.japan": "Japan",
 		"option.left": "Linkes Auge",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (zwei Konsolen)",
 		"option.no": "Nein",
 		"option.none": "Nichts",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-Soundchip",
 		"setting.ym2413.about": "Die FM-Soundeinheit YM2413, die manche Master-System-Spiele für ihre Musik nutzen. Aus nimmt sie aus der Maschine. Es gehört zur Maschine, ein Film braucht also denselben Wert.",
 		"slot.cart": "Modul",
+		"slot.cart2": "Modul von P2",
 		"slot.cart_gg.help": "Das ROM eines Game-Gear-Moduls. Ein Master-System-Modul läuft hier im Master-System-Modus des Game Gear.",
+		"slot.cart_gg2.help": "Das Game-Gear-Modul-ROM von P2, für die rechte Konsole.",
 		"slot.cart_sg.help": "Das ROM eines SG-1000-, SG-1000-II- oder Othello-Multivision-Moduls.",
 		"slot.cart_sms.help": "Das ROM eines Master-System- oder Mark-III-Moduls.",
+		"slot.cart_sms2.help": "Das Mark-III-Modul-ROM von P2, für die rechte Konsole.",
 		"slot.savedata": "Spielstand",
-		"slot.savedata.help": "Das Batterie-RAM des Moduls, wie 'Spielstand exportieren' es schrieb (battery.sav), um das Spiel damit zu beginnen. Leer lassen, um ohne Spielstand zu beginnen."
+		"slot.savedata.help": "Das Batterie-RAM des Moduls, wie 'Spielstand exportieren' es schrieb (battery.sav), um das Spiel damit zu beginnen. Leer lassen, um ohne Spielstand zu beginnen.",
+		"slot.savedata2": "Spielstand von P2",
+		"slot.savedata2.help": "Das Batterie-RAM des Moduls von P2, wie 'Spielstand exportieren' es schrieb (battery2.sav), um damit zu beginnen. Leer lassen, um ohne Spielstand zu beginnen."
 	}
 }

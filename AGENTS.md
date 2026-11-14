@@ -1,7 +1,7 @@
 # AGENTS.md - Gearsystem core for Chimera
 
 This repository builds upstream Gearsystem (Master System and Mark III, Game
-Gear, SG-1000) as a sandboxed guest for Chimera, a frontend for
+Gear, SG-1000, and two of either console joined by a link cable) as a sandboxed guest for Chimera, a frontend for
 tool-assisted speedruns. It produces one file, `gearsystem.chimeraCore`.
 `docs/BUILDING.md` is the full build; `docs/PLAN.md` is why it is shaped
 this way. This file is the short operating guide.
@@ -9,13 +9,13 @@ this way. This file is the short operating guide.
 ## Layout
 
 - `extern/Gearsystem/` - upstream, a shallow submodule at a release tag, unchanged.
-- `patches/` - every change to upstream, applied at meson configure. Today one: the controller port reads are reported (lag frames).
+- `patches/` - every change to upstream, applied at meson configure: the controller port and keyboard reads are reported (lag frames), and upstream's two-console link scheduler can plug in either cable.
 - `meson.build` - one build description, two builds: native (`run-native`, `run-wbx`) and guest (`core.wbx`).
 - `waterbox/cinterface.cpp` - the adapter: Gearsystem behind Chimera's guest interface, compiled the same into both builds.
 - `waterbox/run-native.c`, `waterbox/run-wbx.c`, `waterbox/gate-harness.h` - the two runners and the loop they share.
 - `waterbox/waterbox.config`, `file_slots.json`, `default_keybinds.json`, `package-licenses.json`, `languages/` - what the package declares.
 - `waterbox/run-gate.sh` - the core test script. `waterbox/tests/` - `run-frontend.sh` (Chimera's window), `run-local.sh` (your own games) and their helpers.
-- `tests/make-roms.py` - writes the test cartridges (one per machine) the tests run.
+- `tests/make-roms.py` - writes the test cartridges the tests run: one per machine, and two that talk over the link cables.
 - `.github/workflows/chimera.yml` - CI: core tests, frontend tests, contract tests, publish.
 
 ## Commands, in order

@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "ブート ROM '%1' がないか、読み込めませんでした。",
+		"error.link_refused": "'%1' はこのマシンの通信ケーブルを使えません。",
 		"error.no_file": "プロジェクトにカートリッジファイルがありません。",
 		"error.not_read": "'%1' を読み込めませんでした。",
 		"error.rejected": "Gearsystem は '%1' をカートリッジとして読み込めませんでした。",
@@ -20,10 +21,12 @@
 		"option.full284": "四辺 (幅 284)",
 		"option.full320": "四辺 (幅 320)",
 		"option.gg": "ゲームギア",
+		"option.gglink": "ゲームギアリンク (本体 2 台)",
 		"option.international": "インターナショナル",
 		"option.japan": "日本",
 		"option.left": "左目",
 		"option.lightphaser": "ライトフェイザー",
+		"option.markiiilink": "マークIII リンク (本体 2 台)",
 		"option.no": "いいえ",
 		"option.none": "なし",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM 音源チップ",
 		"setting.ym2413.about": "一部のマスターシステムのゲームが音楽に使う FM 音源ユニット YM2413。オフにするとマシンから外します。マシンの一部なので、ムービーには同じ値が必要です。",
 		"slot.cart": "カートリッジ",
+		"slot.cart2": "P2 のカートリッジ",
 		"slot.cart_gg.help": "ゲームギアのカートリッジ ROM。ここに入れたマスターシステムのカートリッジは、ゲームギアのマスターシステムモードで動きます。",
+		"slot.cart_gg2.help": "右側の本体に入れる P2 のゲームギアのカートリッジ ROM。",
 		"slot.cart_sg.help": "SG-1000、SG-1000 II またはオセロマルチビジョンのカートリッジ ROM。",
 		"slot.cart_sms.help": "マスターシステムまたはマークIII のカートリッジ ROM。",
+		"slot.cart_sms2.help": "右側の本体に入れる P2 のマークIII のカートリッジ ROM。",
 		"slot.savedata": "セーブデータ",
-		"slot.savedata.help": "セーブデータのエクスポートが書き出したカートリッジのバッテリー RAM (battery.sav)。ゲームをそこから始めます。空にするとセーブなしで始まります。"
+		"slot.savedata.help": "セーブデータのエクスポートが書き出したカートリッジのバッテリー RAM (battery.sav)。ゲームをそこから始めます。空にするとセーブなしで始まります。",
+		"slot.savedata2": "P2 のセーブデータ",
+		"slot.savedata2.help": "セーブデータのエクスポートが書き出した P2 のカートリッジのバッテリー RAM (battery2.sav)。そこから始めます。空にするとセーブなしで始まります。"
 	}
 }

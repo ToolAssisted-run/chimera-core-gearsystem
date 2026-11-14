@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Käynnistys-ROM '%1' puuttuu tai sitä ei voitu lukea.",
+		"error.link_refused": "'%1' ei voi käyttää tämän koneen linkkikaapelia.",
 		"error.no_file": "Projektissa ei ole kasettitiedostoa.",
 		"error.not_read": "Tiedostoa '%1' ei voitu lukea.",
 		"error.rejected": "Gearsystem ei voinut ladata tiedostoa '%1' kasettina.",
@@ -20,10 +21,12 @@
 		"option.full284": "Kaikki sivut (284 leveä)",
 		"option.full320": "Kaikki sivut (320 leveä)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (kaksi konsolia)",
 		"option.international": "Kansainvälinen",
 		"option.japan": "Japani",
 		"option.left": "Vasen silmä",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (kaksi konsolia)",
 		"option.no": "Ei",
 		"option.none": "Ei mitään",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-äänipiiri",
 		"setting.ym2413.about": "YM2413-FM-ääniyksikkö, jota jotkin Master System -pelit käyttävät musiikkiinsa. Pois poistaa sen koneesta. Se kuuluu koneeseen, joten elokuva tarvitsee saman arvon.",
 		"slot.cart": "Kasetti",
+		"slot.cart2": "P2:n kasetti",
 		"slot.cart_gg.help": "Game Gear -kasetin ROM. Master System -kasetti tässä ajetaan Game Gearin Master System -tilassa.",
+		"slot.cart_gg2.help": "P2:n Game Gear -kasetin ROM, oikeanpuoleiselle konsolille.",
 		"slot.cart_sg.help": "SG-1000-, SG-1000 II- tai Othello Multivision -kasetin ROM.",
 		"slot.cart_sms.help": "Master System- tai Mark III -kasetin ROM.",
+		"slot.cart_sms2.help": "P2:n Mark III -kasetin ROM, oikeanpuoleiselle konsolille.",
 		"slot.savedata": "Tallennustiedot",
-		"slot.savedata.help": "Kasetin paristomuisti sellaisena kuin Vie tallennustiedot sen kirjoitti (battery.sav), josta peli aloitetaan. Jätä tyhjäksi aloittaaksesi ilman tallennusta."
+		"slot.savedata.help": "Kasetin paristomuisti sellaisena kuin Vie tallennustiedot sen kirjoitti (battery.sav), josta peli aloitetaan. Jätä tyhjäksi aloittaaksesi ilman tallennusta.",
+		"slot.savedata2": "P2:n tallennustiedot",
+		"slot.savedata2.help": "P2:n kasetin paristomuisti sellaisena kuin Vie tallennustiedot sen kirjoitti (battery2.sav), josta aloitetaan. Jätä tyhjäksi aloittaaksesi ilman tallennusta."
 	}
 }

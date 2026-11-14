@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "부트 ROM '%1'이(가) 없거나 읽을 수 없습니다.",
+		"error.link_refused": "'%1'은(는) 이 머신의 통신 케이블을 쓸 수 없습니다.",
 		"error.no_file": "프로젝트에 카트리지 파일이 없습니다.",
 		"error.not_read": "'%1'을(를) 읽을 수 없습니다.",
 		"error.rejected": "Gearsystem이 '%1'을(를) 카트리지로 불러오지 못했습니다.",
@@ -20,10 +21,12 @@
 		"option.full284": "네 변 모두 (너비 284)",
 		"option.full320": "네 변 모두 (너비 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "게임 기어 링크 (콘솔 2대)",
 		"option.international": "국제판",
 		"option.japan": "일본",
 		"option.left": "왼쪽 눈",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "마크 III 링크 (콘솔 2대)",
 		"option.no": "아니요",
 		"option.none": "없음",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM 음원 칩",
 		"setting.ym2413.about": "일부 마스터 시스템 게임이 음악에 쓰는 FM 음원 장치 YM2413. 끄면 머신에서 빠집니다. 머신의 일부이므로 무비에는 같은 값이 필요합니다.",
 		"slot.cart": "카트리지",
+		"slot.cart2": "P2의 카트리지",
 		"slot.cart_gg.help": "게임 기어 카트리지 ROM. 여기에 넣은 마스터 시스템 카트리지는 게임 기어의 마스터 시스템 모드로 실행됩니다.",
+		"slot.cart_gg2.help": "오른쪽 콘솔에 넣는 P2의 게임 기어 카트리지 ROM.",
 		"slot.cart_sg.help": "SG-1000, SG-1000 II 또는 오델로 멀티비전 카트리지 ROM.",
 		"slot.cart_sms.help": "마스터 시스템 또는 마크 III 카트리지 ROM.",
+		"slot.cart_sms2.help": "오른쪽 콘솔에 넣는 P2의 마크 III 카트리지 ROM.",
 		"slot.savedata": "저장 데이터",
-		"slot.savedata.help": "저장 데이터 내보내기가 쓴 카트리지의 배터리 RAM(battery.sav). 게임을 여기서부터 시작합니다. 비워 두면 저장 없이 시작합니다."
+		"slot.savedata.help": "저장 데이터 내보내기가 쓴 카트리지의 배터리 RAM(battery.sav). 게임을 여기서부터 시작합니다. 비워 두면 저장 없이 시작합니다.",
+		"slot.savedata2": "P2의 저장 데이터",
+		"slot.savedata2.help": "저장 데이터 내보내기가 쓴 P2 카트리지의 배터리 RAM(battery2.sav). 여기서부터 시작합니다. 비워 두면 저장 없이 시작합니다."
 	}
 }

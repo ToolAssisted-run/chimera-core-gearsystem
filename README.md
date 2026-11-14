@@ -6,8 +6,9 @@ SG-1000 (and SG-1000 II and Othello Multivision), as a core for
 [Chimera](https://github.com/ToolAssisted-run/chimera). It runs in Chimera's
 miniBox sandbox, so a movie plays the same every time.
 
-One package holds the three machines; a project picks one with its Machine
-setting. The Master System also takes the Light Phaser, the Paddle Control
+One package holds the three machines, and two more that are two consoles
+in one joined by their link cable: two Game Gears (Gear-to-Gear) and two
+Mark IIIs (the Joy-Joy cable). A project picks one with its Machine setting. The Master System also takes the Light Phaser, the Paddle Control
 and the Sports Pad, and the 3D glasses' pictures; the FM sound chip is
 there.
 
@@ -26,5 +27,7 @@ itself, so they need no file from anywhere else.
 ## Licence
 
 The built core is passed on under the GPL-3.0-or-later, Gearsystem's
-licence; this repository's own code is MIT. See `LICENSE` and
+licence, and its FM sound emulation under Genesis Plus GX's terms, so the
+package may not be redistributed commercially. This repository's own code
+is MIT. See `LICENSE` and
 `waterbox/package-licenses.json`.

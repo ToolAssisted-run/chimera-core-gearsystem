@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "A(z) '%1' rendszerindító ROM hiányzik vagy nem olvasható.",
+		"error.link_refused": "A(z) '%1' nem tudja használni ennek a gépnek az összekötő kábelét.",
 		"error.no_file": "A projektben nincs kazettafájl.",
 		"error.not_read": "A(z) '%1' nem olvasható.",
 		"error.rejected": "A Gearsystem nem tudta kazettaként betölteni ezt: '%1'.",
@@ -20,10 +21,12 @@
 		"option.full284": "Minden oldal (284 széles)",
 		"option.full320": "Minden oldal (320 széles)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (két konzol)",
 		"option.international": "Nemzetközi",
 		"option.japan": "Japán",
 		"option.left": "Bal szem",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (két konzol)",
 		"option.no": "Nem",
 		"option.none": "Semmi",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-hangchip",
 		"setting.ym2413.about": "A YM2413 FM-hangegység, amelyet egyes Master System-játékok a zenéjükhöz használnak. A Ki kiveszi a gépből. A gép része, így egy filmnek ugyanez az érték kell.",
 		"slot.cart": "Kazetta",
+		"slot.cart2": "P2 kazettája",
 		"slot.cart_gg.help": "Egy Game Gear-kazetta ROM-ja. Az itt lévő Master System-kazetta a Game Gear Master System-módjában fut.",
+		"slot.cart_gg2.help": "P2 Game Gear-kazettájának ROM-ja, a jobb oldali konzolhoz.",
 		"slot.cart_sg.help": "Egy SG-1000-, SG-1000 II- vagy Othello Multivision-kazetta ROM-ja.",
 		"slot.cart_sms.help": "Egy Master System- vagy Mark III-kazetta ROM-ja.",
+		"slot.cart_sms2.help": "P2 Mark III-kazettájának ROM-ja, a jobb oldali konzolhoz.",
 		"slot.savedata": "Mentett adatok",
-		"slot.savedata.help": "A kazetta elemes RAM-ja, ahogy a Mentett adatok exportálása kiírta (battery.sav), hogy onnan induljon a játék. Hagyja üresen, ha mentés nélkül indulna."
+		"slot.savedata.help": "A kazetta elemes RAM-ja, ahogy a Mentett adatok exportálása kiírta (battery.sav), hogy onnan induljon a játék. Hagyja üresen, ha mentés nélkül indulna.",
+		"slot.savedata2": "P2 mentett adatai",
+		"slot.savedata2.help": "P2 kazettájának elemes RAM-ja, ahogy a Mentett adatok exportálása kiírta (battery2.sav), hogy onnan induljon. Hagyja üresen, ha mentés nélkül indulna."
 	}
 }

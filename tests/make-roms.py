@@ -22,8 +22,16 @@ the cartridge's battery RAM (Sega mapper, 64 KiB cartridge) and writes its
 frame counter there, and copies the first bytes of that RAM into the
 console's RAM at power-on, so a save put back by a project shows.
 
+The link cartridges (gslink.gg, gslink.sms) do the same and also talk to a
+second console: the Game Gear one sends its checksum over the Gear-to-Gear
+cable's serial port each frame the line is free and keeps and counts each
+byte it receives; the Master System one (a Mark III's, Japanese header)
+puts two bits of its checksum on the Joy-Joy cable's lines through the
+SK-1100 keyboard's PPI and reads the other console's two lines, counting
+the reads that saw one low. Each folds what it received into its checksum.
+
 Usage: make-roms.py <output folder>
-  writes gstest.sms, gstest.gg and gstest.sg
+  writes gstest.sms, gstest.gg, gstest.sg, gslink.gg and gslink.sms
 """
 import os
 import sys
@@ -164,14 +172,17 @@ def fold(a, ram_hash):
     a.ld_a_b()
 
 
-def build(kind):
+def build(kind, link=False):
+    """link: the Game Gear one talks over the Gear-to-Gear cable's serial
+    port, the Master System one over the Mark III's Joy-Joy cable (the
+    SK-1100 keyboard's PPI)"""
     sms, gg, sg = kind == "sms", kind == "gg", kind == "sg"
     size = 0x10000 if sms else 0x8000
     a = Asm(size)
     ram = 0xC000
     R = {name: ram + 0x100 + i for i, name in enumerate(
         ["frame", "hash", "p1", "p2", "start", "sx", "sy", "spx", "spy", "nmi",
-         "hc", "vc", "th1", "th2", "th3", "th4", "fm", "save0", "save1"])}
+         "hc", "vc", "th1", "th2", "th3", "th4", "fm", "save0", "save1", "lrx", "lrxn", "key0"])}
     stack = 0xC3F0 if sg else 0xDFF0
 
     # reset
@@ -230,14 +241,45 @@ def build(kind):
         a.ld_a(0x01); a.out(0xF2)
         for reg, v in [(0x30, 0x30), (0x10, 0x80), (0x20, 0x16)]:
             a.ld_a(reg); a.out(0xF0); a.ld_a(v); a.out(0xF1)
+    if link and gg:
+        # Gear-to-Gear serial: receive and send enabled, 4800 baud
+        a.ld_a(0x30); a.out(0x05)
+    if link and sms:
+        # the SK-1100's PPI: ports A and B in, port C out
+        a.ld_a(0x92); a.out(0xDF)
     a.ei()
 
     a.label("loop")
     a.halt()
     # the frame counter
     a.ld_a_mem(R["frame"]); a.inc_a(); a.ld_mem_a(R["frame"])
+    if link and gg:
+        # a byte from the other Game Gear: keep it, count it, fold it in;
+        # then send the checksum (which the pad shapes) when the line is free
+        a.inp(0x05); a.bit_a(1); a.jr_z("norx")
+        a.inp(0x04); a.ld_mem_a(R["lrx"]); fold(a, R["hash"])
+        a.ld_a_mem(R["lrxn"]); a.inc_a(); a.ld_mem_a(R["lrxn"])
+        a.label("norx")
+        a.inp(0x05); a.bit_a(0); a.jr_nz("notx")
+        a.ld_a_mem(R["hash"]); a.out(0x03)
+        a.label("notx")
     # the controls, every second frame
     a.ld_a_mem(R["frame"]); a.and_(1); a.jp_nz("noinput")
+    if link and sms:
+        # keyboard row 0 with two bits of the checksum on the cable's lines,
+        # read the other console's lines (port B) and the row (port A), count
+        # the reads of port B that saw a line pulled low; then row 7, the
+        # pads again
+        a.ld_a_mem(R["hash"]); a.and_(0x60); a.out(0xDE)
+        a.inp(0xDD); a.ld_mem_a(R["lrx"]); fold(a, R["hash"])
+        # (a read of the PPI's port B: bit 7 low, bits 0-4 high, and not
+        # both lines high; a plain controller port reads otherwise)
+        a.and_(0x9F); a.cp(0x1F); a.jr_nz("nolow")
+        a.ld_a_b(); a.cp(0x7F); a.jr_z("nolow")
+        a.ld_a_mem(R["lrxn"]); a.inc_a(); a.ld_mem_a(R["lrxn"])
+        a.label("nolow")
+        a.inp(0xDC); a.ld_mem_a(R["key0"]); fold(a, R["hash"])
+        a.ld_a_mem(R["hash"]); a.and_(0x60); a.or_(0x07); a.out(0xDE)
     a.inp(0xDC); a.ld_mem_a(R["p1"]); fold(a, R["hash"])
     a.inp(0xDD); a.ld_mem_a(R["p2"]); fold(a, R["hash"])
     if gg:
@@ -371,7 +413,7 @@ def build(kind):
         rom[hdr + 10] = csum & 0xFF
         rom[hdr + 11] = csum >> 8
         rom[hdr + 12:hdr + 15] = b"\x00\x00\x00"
-        region = 0x6 if gg else 0x4                    # Game Gear export, Master System export
+        region = 0x6 if gg else (0x3 if link else 0x4)  # Game Gear export; Master System Japan (the Mark III) or export
         rom[hdr + 15] = (region << 4) | 0x0C           # 32 KiB checked
     return bytes(rom)
 
@@ -384,6 +426,9 @@ def main():
     for kind, name in (("sms", "gstest.sms"), ("gg", "gstest.gg"), ("sg", "gstest.sg")):
         with open(os.path.join(out, name), "wb") as f:
             f.write(build(kind))
+    for kind, name in (("gg", "gslink.gg"), ("sms", "gslink.sms")):
+        with open(os.path.join(out, name), "wb") as f:
+            f.write(build(kind, link=True))
 
 
 if __name__ == "__main__":

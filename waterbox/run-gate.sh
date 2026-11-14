@@ -245,6 +245,91 @@ else
 	report "savedata:refused" FAIL "the load failed for another reason: $(head -1 "$work/err")"
 fi
 
+# ---- the link machines: two consoles in one, joined by their cable ----
+# gslink.gg talks over the Gear-to-Gear cable's serial port, gslink.sms over
+# the Mark III's Joy-Joy cable (tests/make-roms.py). Byte 0x114 of a
+# console's RAM counts what it received from the other.
+linkdir() { # name ext system
+	local wd="$work/$1"
+	rm -rf "$wd"; mkdir -p "$wd"
+	cp "$work/roms/gslink.$2" "$wd/"
+	printf '{"cart_%s":["gslink.%s"],"cart_%s2":["gslink.%s"]}' "$2" "$2" "$2" "$2" > "$wd/slots"
+	printf '{"system":"%s"}' "$3" > "$wd/settings"
+	echo "$wd"
+}
+ram_byte() { python3 -c "import sys; print(open(sys.argv[1],'rb').read()[int(sys.argv[2],0)])" "$1" "$2"; }
+for m in "gglink gg ggLink 12" "m3link sms markIIILink 19"; do
+	read -r sys ext system p2button <<< "$m"
+	wd="$(linkdir "$sys" "$ext" "$system")"
+	args=(--sys "$sys" --frames 600 --exercise)
+	if msg="$(equal_runs "$sys" "$wd" "${args[@]}")"; then
+		report "$sys:equivalence" PASS "600 frames, native == sandbox ($(field picture "$work/$sys.box"), two consoles)"
+	else
+		report "$sys:equivalence" FAIL "$msg"; continue
+	fi
+	if "$nat/run-wbx" "$gst/core.wbx" "$wd" "${args[@]}" --rerecord 2>/dev/null | digests > "$work/$sys.rr" \
+		&& cmp -s "$work/$sys.box" "$work/$sys.rr"; then
+		report "$sys:savestate" PASS "a save and a load before every frame change nothing"
+	else
+		report "$sys:savestate" FAIL "$(diff "$work/$sys.box" "$work/$sys.rr" | grep '^[<>]' | head -2 | tr '\n' ' ')"
+	fi
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" "${args[@]}" 2>/dev/null > "$work/tn.raw"
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" "${args[@]}" --turbo 2>/dev/null > "$work/tt.raw"
+	turboDigests < "$work/tn.raw" > "$work/tn.txt"; turboDigests < "$work/tt.raw" > "$work/tt.txt"
+	if cmp -s "$work/tn.txt" "$work/tt.txt" && [ "$(field videoHash "$work/tn.raw")" != "$(field videoHash "$work/tt.raw")" ]; then
+		report "$sys:turbo" PASS "300 frames undrawn, then the same machine and pictures"
+	else
+		report "$sys:turbo" FAIL "turbo changed the machine, or drew every frame"
+	fi
+	# each console received something from the other; the same cartridge on
+	# one console alone receives nothing
+	n1="" n2="" alone=""
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 300 --dump-domain "Main RAM" "$work/l1.ram" >/dev/null 2>&1 && n1="$(ram_byte "$work/l1.ram" 0x114)"
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 300 --dump-domain "P2 Main RAM" "$work/l2.ram" >/dev/null 2>&1 && n2="$(ram_byte "$work/l2.ram" 0x114)"
+	single="$ext"; [ "$ext" = sms ] && settings='{"system":"sms","region":"japan"}' || settings='{"system":"gg"}'
+	swd="$work/$sys.alone"; rm -rf "$swd"; mkdir -p "$swd"; cp "$work/roms/gslink.$ext" "$swd/"
+	printf '{"cart_%s":["gslink.%s"]}' "$ext" "$ext" > "$swd/slots"; printf '%s' "$settings" > "$swd/settings"
+	"$nat/run-wbx" "$gst/core.wbx" "$swd" --sys "$ext" --frames 300 --dump-domain "Main RAM" "$work/l0.ram" >/dev/null 2>&1 && alone="$(ram_byte "$work/l0.ram" 0x114)"
+	if [ "${n1:-0}" -gt 0 ] && [ "${n2:-0}" -gt 0 ] && [ "${alone:-1}" = 0 ]; then
+		report "$sys:exchange" PASS "in 300 frames P1 received $n1 times and P2 $n2; one console alone, 0"
+	else
+		report "$sys:exchange" FAIL "received: P1 ${n1:-?}, P2 ${n2:-?}, alone ${alone:-?}"
+	fi
+	# P2's button reaches P1 only through the cable: held, it changes P1's RAM
+	"$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 300 --hold "$p2button" --dump-domain "Main RAM" "$work/lh.ram" >/dev/null 2>&1
+	if [ -s "$work/lh.ram" ] && ! cmp -s "$work/l1.ram" "$work/lh.ram"; then
+		report "$sys:crossing" PASS "P2's button, held, changes P1's RAM through the cable"
+	else
+		report "$sys:crossing" FAIL "P2's button did not reach P1"
+	fi
+	if msg="$(equal_runs "$sys.power" "$wd" "${args[@]}" --power-at 300)" && ! cmp -s "$work/$sys.box" "$work/$sys.power.box"; then
+		report "$sys:power" PASS "Power at frame 300 restarts both consoles, native == sandbox"
+	else
+		report "$sys:power" FAIL "${msg:-pressing Power changed nothing}"
+	fi
+	# a frame is a lag frame when neither console read its controls; each
+	# reads on every second frame of its own, and the two need not be in
+	# step, so at most about half (a read never reported would make all 600)
+	lag="$("$nat/run-wbx" "$gst/core.wbx" "$wd" --sys "$sys" --frames 600 2>/dev/null | sed -n 's/^lagFrames=//p')"
+	if [ "${lag:-600}" -gt 0 ] && [ "${lag:-600}" -le 310 ]; then
+		report "$sys:lag" PASS "$lag of 600 frames are lag frames (each cartridge reads every second frame)"
+	else
+		report "$sys:lag" FAIL "$lag of 600 frames are lag frames; between 1 and about 300 expected"
+	fi
+done
+# a Game Gear Link takes Game Gear cartridges only
+wd="$work/gglink.refused"; rm -rf "$wd"; mkdir -p "$wd"
+cp "$work/roms/gslink.gg" "$work/roms/gstest.sms" "$wd/"
+printf '{"cart_gg":["gslink.gg"],"cart_gg2":["gstest.sms"]}' > "$wd/slots"
+printf '{"system":"ggLink"}' > "$wd/settings"
+if "$nat/run-wbx" "$gst/core.wbx" "$wd" --sys gglink --frames 2 2>"$work/err" >/dev/null; then
+	report "gglink:refused" FAIL "a Master System cartridge was linked to a Game Gear"
+elif grep -q 'error.link_refused' "$work/err"; then
+	report "gglink:refused" PASS "a Master System cartridge in a Game Gear Link stops the load and says why"
+else
+	report "gglink:refused" FAIL "the load failed for another reason: $(head -1 "$work/err")"
+fi
+
 # ---- the boot ROM ----
 wd="$(workdir bios.missing sms '{"system":"sms","bios":true}')"
 if "$nat/run-wbx" "$gst/core.wbx" "$wd" --sys sms --frames 2 2>"$work/err" >/dev/null; then

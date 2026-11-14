@@ -2,7 +2,8 @@
 
 This repository builds Gearsystem as a sandboxed guest (`core.wbx`) and
 packages it as one file, `gearsystem.chimeraCore`, which Chimera loads as a
-Master System, a Game Gear or an SG-1000. `.github/workflows/chimera.yml`
+Master System, a Game Gear, an SG-1000, or two Game Gears or two Mark IIIs
+joined by their link cable. `.github/workflows/chimera.yml`
 runs the same steps from a fresh clone on a public runner.
 
 Two placeholders are used throughout:
@@ -89,7 +90,9 @@ mkdir -p /tmp/gs-pkg && cp <chimera>/build/Cores/gearsystem.chimeraCore /tmp/gs-
   `tests/firmware-local/ggBios` is your console's boot ROM.
 - `waterbox/tests/run-local.sh` runs every game in `tests/roms-local`
   (gitignored; copy your own cartridges there, never commit them) through
-  the same comparison.
+  the same comparison. With `--link` each Game Gear game also runs on the
+  Game Gear Link with itself, and each Japanese Master System game on the
+  Mark III Link.
 
 ## Troubleshooting
 

@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "La ROM di avvio '%1' manca o non è leggibile.",
+		"error.link_refused": "'%1' non può usare il cavo di collegamento di questa macchina.",
 		"error.no_file": "Il progetto non contiene alcun file di cartuccia.",
 		"error.not_read": "Impossibile leggere '%1'.",
 		"error.rejected": "Gearsystem non è riuscito a caricare '%1' come cartuccia.",
@@ -20,10 +21,12 @@
 		"option.full284": "Tutti i lati (284 di larghezza)",
 		"option.full320": "Tutti i lati (320 di larghezza)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (due console)",
 		"option.international": "Internazionale",
 		"option.japan": "Giappone",
 		"option.left": "Occhio sinistro",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (due console)",
 		"option.no": "No",
 		"option.none": "Niente",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Chip sonoro FM",
 		"setting.ym2413.about": "L'unità sonora FM YM2413, che alcuni giochi Master System usano per la musica. Disattivato la toglie dalla macchina. Fa parte della macchina, quindi un filmato richiede lo stesso valore.",
 		"slot.cart": "Cartuccia",
+		"slot.cart2": "Cartuccia di P2",
 		"slot.cart_gg.help": "La ROM di una cartuccia Game Gear. Una cartuccia Master System qui viene eseguita nella modalità Master System del Game Gear.",
+		"slot.cart_gg2.help": "La ROM della cartuccia Game Gear di P2, per la console a destra.",
 		"slot.cart_sg.help": "La ROM di una cartuccia SG-1000, SG-1000 II o Othello Multivision.",
 		"slot.cart_sms.help": "La ROM di una cartuccia Master System o Mark III.",
+		"slot.cart_sms2.help": "La ROM della cartuccia Mark III di P2, per la console a destra.",
 		"slot.savedata": "Dati di salvataggio",
-		"slot.savedata.help": "La RAM a batteria della cartuccia come l'ha scritta Esporta dati di salvataggio (battery.sav), da cui iniziare il gioco. Lascialo vuoto per iniziare senza salvataggio."
+		"slot.savedata.help": "La RAM a batteria della cartuccia come l'ha scritta Esporta dati di salvataggio (battery.sav), da cui iniziare il gioco. Lascialo vuoto per iniziare senza salvataggio.",
+		"slot.savedata2": "Salvataggio di P2",
+		"slot.savedata2.help": "La RAM a batteria della cartuccia di P2 come l'ha scritta Esporta dati di salvataggio (battery2.sav), da cui iniziare. Lascialo vuoto per iniziare senza salvataggio."
 	}
 }

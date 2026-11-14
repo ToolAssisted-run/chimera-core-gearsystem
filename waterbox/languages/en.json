@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "The boot ROM '%1' is missing or could not be read.",
+		"error.link_refused": "'%1' cannot use the link cable of this machine.",
 		"error.no_file": "No cartridge file is in the project.",
 		"error.not_read": "Could not read '%1'.",
 		"error.rejected": "Gearsystem could not load '%1' as a cartridge.",
@@ -20,10 +21,12 @@
 		"option.full284": "All sides (284 wide)",
 		"option.full320": "All sides (320 wide)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (two consoles)",
 		"option.international": "International",
 		"option.japan": "Japan",
 		"option.left": "Left eye",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (two consoles)",
 		"option.no": "No",
 		"option.none": "Nothing",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM sound chip",
 		"setting.ym2413.about": "The YM2413 FM sound unit, which some Master System games use for their music. Off takes it out of the machine. It is part of the machine, so a movie needs the same value.",
 		"slot.cart": "Cartridge",
+		"slot.cart2": "P2's cartridge",
 		"slot.cart_gg.help": "The Game Gear cartridge ROM. A Master System cartridge here runs in the Game Gear's Master System mode.",
+		"slot.cart_gg2.help": "P2's Game Gear cartridge ROM, for the console on the right.",
 		"slot.cart_sg.help": "The SG-1000, SG-1000 II or Othello Multivision cartridge ROM.",
 		"slot.cart_sms.help": "The Master System or Mark III cartridge ROM.",
+		"slot.cart_sms2.help": "P2's Mark III cartridge ROM, for the console on the right.",
 		"slot.savedata": "Save data",
-		"slot.savedata.help": "The cartridge's battery RAM as Export Save Data wrote it (battery.sav), to start the game from. Leave it empty to start with no save."
+		"slot.savedata.help": "The cartridge's battery RAM as Export Save Data wrote it (battery.sav), to start the game from. Leave it empty to start with no save.",
+		"slot.savedata2": "P2's save data",
+		"slot.savedata2.help": "P2's cartridge's battery RAM as Export Save Data wrote it (battery2.sav), to start from. Leave it empty to start with no save."
 	}
 }

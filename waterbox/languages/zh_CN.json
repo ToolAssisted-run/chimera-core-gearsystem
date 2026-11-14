@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "启动 ROM '%1' 缺失或无法读取。",
+		"error.link_refused": "'%1' 无法使用这台机器的联机线。",
 		"error.no_file": "项目中没有卡带文件。",
 		"error.not_read": "无法读取 '%1'。",
 		"error.rejected": "Gearsystem 无法把 '%1' 作为卡带载入。",
@@ -20,10 +21,12 @@
 		"option.full284": "四周（宽 284）",
 		"option.full320": "四周（宽 320）",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear 联机（两台主机）",
 		"option.international": "国际版",
 		"option.japan": "日本",
 		"option.left": "左眼",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III 联机（两台主机）",
 		"option.no": "否",
 		"option.none": "无",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM 音源芯片",
 		"setting.ym2413.about": "一些 Master System 游戏用于音乐的 YM2413 FM 音源单元。关闭会把它从机器中移除。它是机器的一部分，所以影片需要相同的值。",
 		"slot.cart": "卡带",
+		"slot.cart2": "P2 的卡带",
 		"slot.cart_gg.help": "Game Gear 卡带 ROM。放在这里的 Master System 卡带会在 Game Gear 的 Master System 模式下运行。",
+		"slot.cart_gg2.help": "P2 的 Game Gear 卡带 ROM，用于右侧的主机。",
 		"slot.cart_sg.help": "SG-1000、SG-1000 II 或 Othello Multivision 卡带 ROM。",
 		"slot.cart_sms.help": "Master System 或 Mark III 卡带 ROM。",
+		"slot.cart_sms2.help": "P2 的 Mark III 卡带 ROM，用于右侧的主机。",
 		"slot.savedata": "存档数据",
-		"slot.savedata.help": "由“导出存档数据”写出的卡带电池 RAM（battery.sav），游戏从它开始。留空则不带存档开始。"
+		"slot.savedata.help": "由“导出存档数据”写出的卡带电池 RAM（battery.sav），游戏从它开始。留空则不带存档开始。",
+		"slot.savedata2": "P2 的存档数据",
+		"slot.savedata2.help": "由“导出存档数据”写出的 P2 卡带电池 RAM（battery2.sav），从它开始。留空则不带存档开始。"
 	}
 }

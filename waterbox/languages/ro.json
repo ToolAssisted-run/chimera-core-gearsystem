@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "ROM-ul de pornire '%1' lipsește sau nu a putut fi citit.",
+		"error.link_refused": "'%1' nu poate folosi cablul de legătură al acestei mașini.",
 		"error.no_file": "Proiectul nu conține niciun fișier de cartuș.",
 		"error.not_read": "Nu s-a putut citi '%1'.",
 		"error.rejected": "Gearsystem nu a putut încărca '%1' ca un cartuș.",
@@ -20,10 +21,12 @@
 		"option.full284": "Toate laturile (lățime 284)",
 		"option.full320": "Toate laturile (lățime 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (două console)",
 		"option.international": "Internațional",
 		"option.japan": "Japonia",
 		"option.left": "Ochiul stâng",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (două console)",
 		"option.no": "Nu",
 		"option.none": "Nimic",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Cip de sunet FM",
 		"setting.ym2413.about": "Unitatea de sunet FM YM2413, pe care unele jocuri Master System o folosesc pentru muzică. Oprit o scoate din mașină. Face parte din mașină, deci un film are nevoie de aceeași valoare.",
 		"slot.cart": "Cartuș",
+		"slot.cart2": "Cartușul lui P2",
 		"slot.cart_gg.help": "ROM-ul unui cartuș Game Gear. Un cartuș Master System pus aici rulează în modul Master System al lui Game Gear.",
+		"slot.cart_gg2.help": "ROM-ul cartușului Game Gear al lui P2, pentru consola din dreapta.",
 		"slot.cart_sg.help": "ROM-ul unui cartuș SG-1000, SG-1000 II sau Othello Multivision.",
 		"slot.cart_sms.help": "ROM-ul unui cartuș Master System sau Mark III.",
+		"slot.cart_sms2.help": "ROM-ul cartușului Mark III al lui P2, pentru consola din dreapta.",
 		"slot.savedata": "Date salvate",
-		"slot.savedata.help": "Memoria RAM cu baterie a cartușului, așa cum a scris-o Exportă datele salvate (battery.sav), de la care pornește jocul. Lăsați gol pentru a începe fără salvare."
+		"slot.savedata.help": "Memoria RAM cu baterie a cartușului, așa cum a scris-o Exportă datele salvate (battery.sav), de la care pornește jocul. Lăsați gol pentru a începe fără salvare.",
+		"slot.savedata2": "Datele salvate ale lui P2",
+		"slot.savedata2.help": "Memoria RAM cu baterie a cartușului lui P2, așa cum a scris-o Exportă datele salvate (battery2.sav), de la care pornește. Lăsați gol pentru a începe fără salvare."
 	}
 }

@@ -11,8 +11,18 @@
  * - the cartridge, the boot ROMs and a save are mounted files read in Init;
  * - a frame is one RunToVBlank, its picture BGRA and its sound 44100 Hz
  *   stereo;
- * - a read of the controller ports is reported here (patches/0001), for lag
- *   frames and for Lua's event.oninputpoll.
+ * - a read of the controls is reported here (patches/0001 and 0002), for
+ *   lag frames and for Lua's event.oninputpoll.
+ *
+ * Two of the machines are two consoles joined by a link cable, shown to
+ * Chimera as one machine (the owner, 2026-11-14): two Game Gears with the
+ * Gear-to-Gear cable, and two Mark IIIs with the Joy-Joy cable on their
+ * SK-1100 keyboards. Both consoles live in this one sandbox and are run by
+ * upstream's own scheduler for its libretro core's link (LibretroLink,
+ * platforms/libretro/libretro_link.cpp): the console that is behind runs
+ * the next instruction, and what one puts on the wires reaches the other at
+ * the cycle it was put there. A frame is a fixed number of cycles; the two
+ * pictures stand side by side and the two sounds are mixed.
  *
  * This file compiles the same for the sandbox (miniBox's emulibc) and for
  * the native reference (native-shim/emulibc.h), which is what makes the
@@ -29,6 +39,7 @@
 #include <waterbox_slots.h>
 
 #include "gearsystem.h"
+#include "libretro_link.h"
 
 /* A text a person reads is a key of languages/en.json, each of its
  * arguments after a TEXT_ARG (Chimera docs/translations.md). */
@@ -40,8 +51,9 @@
 bool g_mcp_stdio_mode = true;
 
 /* ---- which machine ---- */
-enum { SYS_SMS = 0, SYS_GG = 1, SYS_SG = 2 };
+enum { SYS_SMS = 0, SYS_GG = 1, SYS_SG = 2, SYS_GGLINK = 3, SYS_M3LINK = 4 };
 static int g_system;
+static int g_count = 1; /* consoles: 2 on the link machines */
 
 /* ---- the controls, as waterbox.config lists them for each machine ----
  * Master System: 0 Power, 1 Reset, 2 Pause, 3..8 P1 Up Down Left Right
@@ -51,9 +63,14 @@ static int g_system;
  *                6 P2 Sports Pad Y.
  * Game Gear:     0 Power, 1..6 P1 Up Down Left Right Button 1 Button 2,
  *                7 P1 Start.
- * SG-1000:       0 Power, 1 Pause, 2..7 P1 (as above), 8..13 P2. */
-#define MAX_BUTTONS 16
+ * SG-1000:       0 Power, 1 Pause, 2..7 P1 (as above), 8..13 P2.
+ * Game Gear Link: 0 Power, 1..7 P1 (as a Game Gear), 8..14 P2 the same.
+ * Mark III Link: 0 Power, then for each console (P1 at 1, P2 at 13): Reset,
+ *                Pause, the pad's six, and the keyboard's 1, 2, Space and
+ *                Return. */
+#define MAX_BUTTONS 32
 #define AXIS_COUNT 7
+#define M3_BLOCK 12
 static uint8_t g_buttons[MAX_BUTTONS];
 static int32_t g_axes[AXIS_COUNT] = { 32768, 32768, 32768, 32768, 32768, 32768, 32768 };
 
@@ -61,17 +78,25 @@ enum { DEV_NONE = 0, DEV_PAD, DEV_PHASER, DEV_PADDLE, DEV_SPORTSPAD };
 static int g_port[2];
 static bool g_allowUpDown;
 /* the libretro core's rule for opposite directions held together: the one
- * pressed first wins (state of the machine's controls, so in the savestate) */
+ * pressed first wins (state of the machine's controls, so in the savestate);
+ * one pair for each pad: the two ports, or the two linked consoles */
 static int8_t g_latchV[2], g_latchH[2];
 
-static GearsystemCore *g_core;
-static Cartridge::ForceConfiguration g_config;
+static GearsystemCore *g_cores[2];
+#define g_core (g_cores[0])
+static Cartridge::ForceConfiguration g_config;       /* from the settings */
+static Cartridge::ForceConfiguration g_configs[2];   /* each console's, its variant chosen */
 static int g_inited;
 static int g_inputRead;
 static char g_loadError[1100];
 
+/* the link machines: upstream's two instances and its scheduler */
+static LibretroInstance g_inst[2];
+static LibretroLink *g_link;
+
 /* ---- picture and sound ---- */
-static uint8_t g_frame[GS_RESOLUTION_MAX_WIDTH_WITH_OVERSCAN * GS_RESOLUTION_MAX_HEIGHT_WITH_OVERSCAN * 4];
+#define FRAME_W 512 /* two Mark III pictures side by side */
+static uint8_t g_frame[FRAME_W * GS_RESOLUTION_MAX_HEIGHT_WITH_OVERSCAN * 4];
 static int g_vwidth = GS_RESOLUTION_SMS_WIDTH, g_vheight = GS_RESOLUTION_SMS_HEIGHT;
 static s16 g_audio[8192];
 static int g_nsamples;
@@ -84,13 +109,16 @@ ECL_INVISIBLE static int g_render = 1;
  * is the same callback slot in every session and no savestate carries it. */
 ECL_INVISIBLE static uintptr_t (*g_inputPoll)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t);
 
-/* patches/0001: Input::GetPortDC, GetPortDD and GetPort00 call this */
+/* patches/0001 and 0002: Input::GetPortDC, GetPortDD and GetPort00, and a
+ * read of the Mark III keyboard, call this */
 void chimera_input_read(void)
 {
 	g_inputRead = 1;
 	if (g_inputPoll)
 		g_inputPoll(0, 0, 0, 0, 0, 0);
 }
+
+static bool linked(void) { return g_count == 2; }
 
 static void set_error(const char *key, const char *arg)
 {
@@ -149,6 +177,8 @@ static int port_device(const char *key, bool allowGuns)
 	return DEV_PAD;
 }
 
+static bool is_gg(void) { return g_system == SYS_GG || g_system == SYS_GGLINK; }
+
 static void read_force_config(void)
 {
 	char buf[48];
@@ -156,11 +186,13 @@ static void read_force_config(void)
 	g_config.system = Cartridge::CartridgeUnknownSystem;
 
 	setting_str("region", buf, sizeof buf, "auto");
-	if (!strcmp(buf, "japan"))
-		g_config.zone = g_system == SYS_GG ? Cartridge::CartridgeJapanGG : Cartridge::CartridgeJapanSMS;
+	if (g_system == SYS_M3LINK)
+		g_config.zone = Cartridge::CartridgeJapanSMS; /* the Mark III is Japan's */
+	else if (!strcmp(buf, "japan"))
+		g_config.zone = is_gg() ? Cartridge::CartridgeJapanGG : Cartridge::CartridgeJapanSMS;
 	else if (!strcmp(buf, "export"))
-		g_config.zone = g_system == SYS_GG ? Cartridge::CartridgeExportGG : Cartridge::CartridgeExportSMS;
-	else if (!strcmp(buf, "international") && g_system == SYS_GG)
+		g_config.zone = is_gg() ? Cartridge::CartridgeExportGG : Cartridge::CartridgeExportSMS;
+	else if (!strcmp(buf, "international") && is_gg())
 		g_config.zone = Cartridge::CartridgeInternationalGG;
 	else
 		g_config.zone = Cartridge::CartridgeUnknownZone;
@@ -209,11 +241,13 @@ static void read_force_config(void)
  * (its name and its header) only picks among the variants of that machine:
  * a Game Gear cartridge on the Game Gear runs as upstream finds it, and any
  * other cartridge on a Game Gear runs in its Master System mode, as with
- * the Master Gear converter. */
+ * the Master Gear converter. A Game Gear Link runs its consoles natively,
+ * as the cable is the native mode's. */
+static bool g_notForLink; /* set by choose_system: not a Game Gear cartridge */
 static Cartridge::CartridgeSystem choose_system(const uint8_t *rom, long size, const char *name)
 {
 	char model[32];
-	if (g_system == SYS_SMS)
+	if (g_system == SYS_SMS || g_system == SYS_M3LINK)
 		return Cartridge::CartridgeSMS;
 
 	Cartridge probe;
@@ -224,11 +258,14 @@ static Cartridge::CartridgeSystem choose_system(const uint8_t *rom, long size, c
 	bool gg = probe.IsGameGear();
 	bool sg = probe.IsSG1000();
 
-	if (g_system == SYS_GG)
+	if (is_gg())
 	{
+		g_notForLink = g_system == SYS_GGLINK && !gg;
 		setting_str("ggModel", model, sizeof model, "auto");
 		if (!strcmp(model, "2asic")) return Cartridge::CartridgeGG2ASIC;
 		if (!strcmp(model, "1asic")) return Cartridge::CartridgeGG1ASIC;
+		if (g_system == SYS_GGLINK)
+			return probe.GetGameGearASIC() == 1 ? Cartridge::CartridgeGG1ASIC : Cartridge::CartridgeGG2ASIC;
 		if (!strcmp(model, "2asicSmsMode")) return Cartridge::CartridgeGG2ASICSMSMode;
 		if (!strcmp(model, "1asicSmsMode")) return Cartridge::CartridgeGG1ASICSMSMode;
 		if (gg)
@@ -251,25 +288,30 @@ static Cartridge::CartridgeSystem choose_system(const uint8_t *rom, long size, c
 
 static void apply_devices(void)
 {
-	bool phaser = g_system == SYS_SMS && g_port[0] == DEV_PHASER;
-	bool paddle = g_system == SYS_SMS && g_port[0] == DEV_PADDLE;
-	g_core->EnablePhaser(phaser);
-	g_core->EnablePaddle(paddle);
-	g_core->EnableSportsPad(Joypad_1, g_system == SYS_SMS && g_port[0] == DEV_SPORTSPAD);
-	g_core->EnableSportsPad(Joypad_2, g_system == SYS_SMS && g_port[1] == DEV_SPORTSPAD);
-	/* the crosshair would be drawn into the picture the phaser reads */
-	g_core->EnablePhaserCrosshair(false, Video::LightPhaserCrosshairCross, Video::LightPhaserCrosshairWhite);
+	bool sms = g_system == SYS_SMS;
+	for (int i = 0; i < g_count; i++)
+	{
+		GearsystemCore *c = g_cores[i];
+		c->EnablePhaser(sms && g_port[0] == DEV_PHASER);
+		c->EnablePaddle(sms && g_port[0] == DEV_PADDLE);
+		c->EnableSportsPad(Joypad_1, sms && g_port[0] == DEV_SPORTSPAD);
+		c->EnableSportsPad(Joypad_2, sms && g_port[1] == DEV_SPORTSPAD);
+		/* the crosshair would be drawn into the picture the phaser reads */
+		c->EnablePhaserCrosshair(false, Video::LightPhaserCrosshairCross, Video::LightPhaserCrosshairWhite);
+	}
 }
 
 /* The picture settings, the sound chip's switch and the volumes: set before
- * the cartridge loads, as the libretro core does. */
-static void apply_machine_settings(void)
+ * the cartridge loads, as the libretro core does. A linked console has no
+ * border: the two pictures stand side by side. */
+static void apply_machine_settings(GearsystemCore *core)
 {
 	char buf[32];
-	Video *video = g_core->GetVideo();
+	Video *video = core->GetVideo();
 
 	setting_str("overscan", buf, sizeof buf, "off");
-	if (!strcmp(buf, "topBottom")) video->SetOverscan(Video::OverscanTopBottom);
+	if (linked()) video->SetOverscan(Video::OverscanDisabled);
+	else if (!strcmp(buf, "topBottom")) video->SetOverscan(Video::OverscanTopBottom);
 	else if (!strcmp(buf, "full284")) video->SetOverscan(Video::OverscanFull284);
 	else if (!strcmp(buf, "full320")) video->SetOverscan(Video::OverscanFull320);
 	else video->SetOverscan(Video::OverscanDisabled);
@@ -281,27 +323,27 @@ static void apply_machine_settings(void)
 
 	video->SetNoSpriteLimit(wbx_setting_bool("noSpriteLimit", 0) != 0);
 
-	g_core->GetAudio()->DisableYM2413(setting_is("ym2413", "off", "auto"));
+	core->GetAudio()->DisableYM2413(setting_is("ym2413", "off", "auto"));
 	long psg = wbx_setting_long("psgVolume", 100);
 	long fm = wbx_setting_long("fmVolume", 100);
 	if (psg < 0 || psg > 200) psg = 100;
 	if (fm < 0 || fm > 200) fm = 100;
-	g_core->GetAudio()->SetPSGVolume((float)psg / 100.0f);
-	g_core->GetAudio()->SetFMVolume((float)fm / 100.0f);
+	core->GetAudio()->SetPSGVolume((float)psg / 100.0f);
+	core->GetAudio()->SetFMVolume((float)fm / 100.0f);
 
 	setting_str("glasses", buf, sizeof buf, "both");
-	if (!strcmp(buf, "left")) g_core->SetGlassesConfig(GearsystemCore::GlassesLeftEye);
-	else if (!strcmp(buf, "right")) g_core->SetGlassesConfig(GearsystemCore::GlassesRightEye);
-	else g_core->SetGlassesConfig(GearsystemCore::GlassesBothEyes);
+	if (!strcmp(buf, "left")) core->SetGlassesConfig(GearsystemCore::GlassesLeftEye);
+	else if (!strcmp(buf, "right")) core->SetGlassesConfig(GearsystemCore::GlassesRightEye);
+	else core->SetGlassesConfig(GearsystemCore::GlassesBothEyes);
 
 	g_allowUpDown = wbx_setting_bool("allowUpDown", 0) != 0;
 }
 
 /* a boot ROM the project chose to run; returns 0 and sets the error when
  * it is asked for and cannot be had */
-static int load_bios(void)
+static int load_bios(GearsystemCore *core)
 {
-	bool gg = g_system == SYS_GG;
+	bool gg = is_gg();
 	if (g_system == SYS_SG || !wbx_setting_bool("bios", 0))
 		return 1;
 	const char *id = gg ? "ggBios" : "smsBios";
@@ -313,7 +355,7 @@ static int load_bios(void)
 		set_error("error.bios_not_read", id);
 		return 0;
 	}
-	bool ok = g_core->GetMemory()->LoadBootromFromBuffer(buf, (int)size, gg);
+	bool ok = core->GetMemory()->LoadBootromFromBuffer(buf, (int)size, gg);
 	delete[] buf;
 	if (!ok)
 	{
@@ -321,23 +363,30 @@ static int load_bios(void)
 		return 0;
 	}
 	if (gg)
-		g_core->GetMemory()->EnableBootromGG(true);
+		core->GetMemory()->EnableBootromGG(true);
 	else
-		g_core->GetMemory()->EnableBootromSMS(true);
+		core->GetMemory()->EnableBootromSMS(true);
 	return 1;
 }
 
-static const char *cart_slot(void)
+static const char *cart_slot(int console)
 {
-	return g_system == SYS_GG ? "cart_gg" : g_system == SYS_SG ? "cart_sg" : "cart_sms";
+	switch (g_system)
+	{
+	case SYS_GG: return "cart_gg";
+	case SYS_SG: return "cart_sg";
+	case SYS_GGLINK: return console ? "cart_gg2" : "cart_gg";
+	case SYS_M3LINK: return console ? "cart_sms2" : "cart_sms";
+	default: return "cart_sms";
+	}
 }
 
 /* the battery RAM a save file of the project puts back, before the machine
  * runs (docs/save-data.md in Chimera: names are identity) */
-static int load_savedata(void)
+static int load_savedata(GearsystemCore *core, const char *slot)
 {
 	char name[512];
-	if (wbx_slot_count("savedata") <= 0 || wbx_slot_name("savedata", 0, name, sizeof name) == NULL)
+	if (wbx_slot_count(slot) <= 0 || wbx_slot_name(slot, 0, name, sizeof name) == NULL)
 		return 1;
 	long size = 0;
 	uint8_t *buf = read_file(name, &size);
@@ -346,7 +395,7 @@ static int load_savedata(void)
 		set_error("error.not_read", name);
 		return 0;
 	}
-	MemoryRule *rule = g_core->GetMemory()->GetCurrentRule();
+	MemoryRule *rule = core->GetMemory()->GetCurrentRule();
 	std::string bytes((const char *)buf, (size_t)size);
 	delete[] buf;
 	std::istringstream stream(bytes);
@@ -354,6 +403,64 @@ static int load_savedata(void)
 	{
 		set_error("error.save_refused", name);
 		return 0;
+	}
+	return 1;
+}
+
+/* one console: its settings, boot ROM and cartridge */
+static int load_console(int i)
+{
+	GearsystemCore *core = new GearsystemCore();
+	g_cores[i] = core;
+	/* a linked console draws into upstream's 16-bit instance buffer */
+	core->Init(linked() ? GS_PIXEL_RGB565 : GS_PIXEL_BGRA8888);
+	apply_machine_settings(core);
+	if (!load_bios(core))
+		return 0;
+
+	/* the cartridge: the project's slot for this console, else (one
+	 * console only) the plain rom mount */
+	char name[512];
+	const char *slot = cart_slot(i);
+	const char *file = i == 0 ? "rom" : NULL;
+	if (wbx_slot_count(slot) > 0 && wbx_slot_name(slot, 0, name, sizeof name) != NULL)
+		file = name;
+	if (!file)
+	{
+		set_error("error.no_file", NULL);
+		return 0;
+	}
+	long size = 0;
+	uint8_t *rom = read_file(file, &size);
+	if (!rom)
+	{
+		set_error(size < 0 ? "error.not_read" : "error.no_file", size < 0 ? file : NULL);
+		return 0;
+	}
+	Cartridge::ForceConfiguration config = g_config;
+	config.system = choose_system(rom, size, file);
+	g_configs[i] = config;
+	bool loaded = size > 0 && size <= MAX_ROM_SIZE
+		&& core->LoadROMFromBuffer(rom, (int)size, &config, file);
+	delete[] rom;
+	if (!loaded)
+	{
+		set_error("error.rejected", file);
+		return 0;
+	}
+	/* Video::Reset keeps what was set; set it again all the same, so a
+	 * later upstream that resets it on load cannot drop a setting */
+	apply_machine_settings(core);
+
+	if (linked())
+	{
+		GS_LinkCable_Protocol want = g_system == SYS_GGLINK ? LinkCableProtocolGearToGear : LinkCableProtocolMarkIII;
+		bool palMatch = i == 0 || core->GetCartridge()->IsPAL() == g_cores[0]->GetCartridge()->IsPAL();
+		if (g_notForLink || core->GetSupportedLinkCableProtocol() != want || !palMatch)
+		{
+			set_error("error.link_refused", file);
+			return 0;
+		}
 	}
 	return 1;
 }
@@ -369,60 +476,61 @@ ECL_EXPORT int Init(void)
 {
 	g_loadError[0] = 0;
 
-	if (setting_is("system", "gg", "sms")) g_system = SYS_GG;
-	else if (setting_is("system", "sg1000", "sms")) g_system = SYS_SG;
+	char sys[32];
+	setting_str("system", sys, sizeof sys, "sms");
+	if (!strcmp(sys, "gg")) g_system = SYS_GG;
+	else if (!strcmp(sys, "sg1000")) g_system = SYS_SG;
+	else if (!strcmp(sys, "ggLink")) g_system = SYS_GGLINK;
+	else if (!strcmp(sys, "markIIILink")) g_system = SYS_M3LINK;
 	else g_system = SYS_SMS;
-
-	g_core = new GearsystemCore();
-	g_core->Init(GS_PIXEL_BGRA8888);
+	g_count = (g_system == SYS_GGLINK || g_system == SYS_M3LINK) ? 2 : 1;
 
 	read_force_config();
-	apply_machine_settings();
-	if (!load_bios())
-		return 0;
+	for (int i = 0; i < g_count; i++)
+		if (!load_console(i))
+			return 0;
 
-	/* the cartridge: the project's slot for this machine, else the plain
-	 * rom mount */
-	char name[512];
-	const char *file = "rom";
-	if (wbx_slot_count(cart_slot()) > 0 && wbx_slot_name(cart_slot(), 0, name, sizeof name) != NULL)
-		file = name;
-	long size = 0;
-	uint8_t *rom = read_file(file, &size);
-	if (!rom)
+	if (g_system == SYS_SMS || g_system == SYS_SG)
 	{
-		set_error(size < 0 ? "error.not_read" : "error.no_file", size < 0 ? file : NULL);
-		return 0;
+		g_port[0] = port_device("port1", g_system == SYS_SMS);
+		g_port[1] = port_device("port2", false);
 	}
-	g_config.system = choose_system(rom, size, file);
-	bool loaded = size > 0 && size <= MAX_ROM_SIZE
-		&& g_core->LoadROMFromBuffer(rom, (int)size, &g_config, file);
-	delete[] rom;
-	if (!loaded)
+	else
 	{
-		set_error("error.rejected", file);
-		return 0;
-	}
-	/* Video::Reset keeps what was set; set it again all the same, so a
-	 * later upstream that resets it on load cannot drop a setting */
-	apply_machine_settings();
-
-	g_port[0] = port_device("port1", true);
-	g_port[1] = port_device("port2", false);
-	if (g_system == SYS_GG)
-	{
+		/* a Game Gear's own pad; a linked Mark III's first port */
 		g_port[0] = DEV_PAD;
 		g_port[1] = DEV_NONE;
 	}
 	apply_devices();
 
-	if (!load_savedata())
+	if (!load_savedata(g_cores[0], "savedata"))
+		return 0;
+	if (linked() && !load_savedata(g_cores[1], "savedata2"))
 		return 0;
 
-	GS_RuntimeInfo info;
-	g_core->GetRuntimeInfo(info);
-	g_vwidth = info.screen_width;
-	g_vheight = info.screen_height;
+	if (linked())
+	{
+		/* upstream's scheduler for two consoles, plugged in before the
+		 * first instruction runs (the Mark III's keyboard and cable must be
+		 * there at power-on) */
+		for (int i = 0; i < 2; i++)
+			g_inst[i].core = g_cores[i];
+		g_link = new LibretroLink(g_inst, g_latchV, g_latchH);
+		g_link->SetProtocol(g_system == SYS_GGLINK ? LinkCableProtocolGearToGear : LinkCableProtocolMarkIII);
+		g_link->Reset();
+		GS_RuntimeInfo a, b;
+		g_cores[0]->GetRuntimeInfo(a);
+		g_cores[1]->GetRuntimeInfo(b);
+		g_vwidth = a.screen_width + b.screen_width;
+		g_vheight = a.screen_height > b.screen_height ? a.screen_height : b.screen_height;
+	}
+	else
+	{
+		GS_RuntimeInfo info;
+		g_core->GetRuntimeInfo(info);
+		g_vwidth = info.screen_width;
+		g_vheight = info.screen_height;
+	}
 	memset(g_frame, 0, sizeof g_frame);
 	for (size_t i = 3; i < sizeof g_frame; i += 4)
 		g_frame[i] = 0xFF;
@@ -445,46 +553,46 @@ ECL_EXPORT void SetAxis(int32_t index, int32_t value)
 
 } /* extern "C" */
 
-static void key(GS_Joypads pad, GS_Keys k, bool down)
+static void key(GearsystemCore *core, GS_Joypads pad, GS_Keys k, bool down)
 {
 	if (down)
-		g_core->KeyPressed(pad, k);
+		core->KeyPressed(pad, k);
 	else
-		g_core->KeyReleased(pad, k);
+		core->KeyReleased(pad, k);
 }
 
 /* one pad's six controls from the wire, opposite directions settled the
- * libretro core's way unless the project allows both */
-static void pad(int player, int base)
+ * libretro core's way unless the project allows both; latch is the pad's
+ * own pair of the latches */
+static void pad(GearsystemCore *core, GS_Joypads p, int latch, int base)
 {
-	GS_Joypads p = (GS_Joypads)player;
 	bool up = g_buttons[base + 0], down = g_buttons[base + 1];
 	bool left = g_buttons[base + 2], right = g_buttons[base + 3];
 	if (!g_allowUpDown)
 	{
 		if (up && down)
 		{
-			if (g_latchV[player] == 0) g_latchV[player] = 1;
-			up = g_latchV[player] > 0;
+			if (g_latchV[latch] == 0) g_latchV[latch] = 1;
+			up = g_latchV[latch] > 0;
 			down = !up;
 		}
 		else
-			g_latchV[player] = up ? 1 : down ? -1 : 0;
+			g_latchV[latch] = up ? 1 : down ? -1 : 0;
 		if (left && right)
 		{
-			if (g_latchH[player] == 0) g_latchH[player] = 1;
-			left = g_latchH[player] > 0;
+			if (g_latchH[latch] == 0) g_latchH[latch] = 1;
+			left = g_latchH[latch] > 0;
 			right = !left;
 		}
 		else
-			g_latchH[player] = left ? 1 : right ? -1 : 0;
+			g_latchH[latch] = left ? 1 : right ? -1 : 0;
 	}
-	key(p, Key_Up, up);
-	key(p, Key_Down, down);
-	key(p, Key_Left, left);
-	key(p, Key_Right, right);
-	key(p, Key_1, g_buttons[base + 4]);
-	key(p, Key_2, g_buttons[base + 5]);
+	key(core, p, Key_Up, up);
+	key(core, p, Key_Down, down);
+	key(core, p, Key_Left, left);
+	key(core, p, Key_Right, right);
+	key(core, p, Key_1, g_buttons[base + 4]);
+	key(core, p, Key_2, g_buttons[base + 5]);
 }
 
 /* an absolute axis, 0..65535 across the picture, to a place on it */
@@ -503,15 +611,23 @@ static float speed(int32_t v)
 	return (float)(v - 32768) / 4096.0f;
 }
 
+static void m3key(GearsystemCore *core, GS_MarkIII_Key k, bool down)
+{
+	if (down)
+		core->MarkIIIKeyPressed(k);
+	else
+		core->MarkIIIKeyReleased(k);
+}
+
 static void apply_inputs(void)
 {
 	switch (g_system)
 	{
 	case SYS_SMS:
 		g_core->SetReset(g_buttons[1]);
-		key(Joypad_1, Key_Start, g_buttons[2]); /* the Pause button: an NMI as it goes down */
-		if (g_port[0] != DEV_NONE) pad(0, 3);
-		if (g_port[1] != DEV_NONE) pad(1, 9);
+		key(g_core, Joypad_1, Key_Start, g_buttons[2]); /* the Pause button: an NMI as it goes down */
+		if (g_port[0] != DEV_NONE) pad(g_core, Joypad_1, 0, 3);
+		if (g_port[1] != DEV_NONE) pad(g_core, Joypad_2, 1, 9);
 		if (g_port[0] == DEV_PHASER)
 		{
 			GS_RuntimeInfo info;
@@ -531,15 +647,71 @@ static void apply_inputs(void)
 			g_core->MoveSportsPad(Joypad_2, speed(g_axes[5]), speed(g_axes[6]));
 		break;
 	case SYS_GG:
-		pad(0, 1);
-		key(Joypad_1, Key_Start, g_buttons[7]);
+		pad(g_core, Joypad_1, 0, 1);
+		key(g_core, Joypad_1, Key_Start, g_buttons[7]);
+		break;
+	case SYS_GGLINK:
+		for (int i = 0; i < 2; i++)
+		{
+			pad(g_cores[i], Joypad_1, i, 1 + 7 * i);
+			key(g_cores[i], Joypad_1, Key_Start, g_buttons[7 + 7 * i]);
+		}
+		break;
+	case SYS_M3LINK:
+		for (int i = 0; i < 2; i++)
+		{
+			const int b = 1 + M3_BLOCK * i;
+			g_cores[i]->SetReset(g_buttons[b]);
+			key(g_cores[i], Joypad_1, Key_Start, g_buttons[b + 1]);
+			pad(g_cores[i], Joypad_1, i, b + 2);
+			m3key(g_cores[i], MarkIIIKey1, g_buttons[b + 8]);
+			m3key(g_cores[i], MarkIIIKey2, g_buttons[b + 9]);
+			m3key(g_cores[i], MarkIIIKeySpace, g_buttons[b + 10]);
+			m3key(g_cores[i], MarkIIIKeyReturn, g_buttons[b + 11]);
+		}
 		break;
 	default:
-		key(Joypad_1, Key_Start, g_buttons[1]); /* the Pause button */
-		if (g_port[0] != DEV_NONE) pad(0, 2);
-		if (g_port[1] != DEV_NONE) pad(1, 8);
+		key(g_core, Joypad_1, Key_Start, g_buttons[1]); /* the Pause button */
+		if (g_port[0] != DEV_NONE) pad(g_core, Joypad_1, 0, 2);
+		if (g_port[1] != DEV_NONE) pad(g_core, Joypad_2, 1, 8);
 		break;
 	}
+}
+
+/* RGB565 (upstream's link instances) to opaque BGRA, each channel widened
+ * by repeating its top bits */
+static inline uint32_t bgra565(uint16_t c)
+{
+	uint32_t r = (c >> 11) & 0x1F, g = (c >> 5) & 0x3F, b = c & 0x1F;
+	r = (r << 3) | (r >> 2);
+	g = (g << 2) | (g >> 4);
+	b = (b << 3) | (b >> 2);
+	return b | (g << 8) | (r << 16) | 0xFF000000u;
+}
+
+/* the two linked consoles' pictures side by side, P1 on the left */
+static void compose_link_picture(void)
+{
+	GS_RuntimeInfo info[2];
+	int x = 0, h = 0;
+	for (int i = 0; i < 2; i++)
+	{
+		g_cores[i]->GetRuntimeInfo(info[i]);
+		if (info[i].screen_height > h) h = info[i].screen_height;
+	}
+	uint32_t *dst = (uint32_t *)g_frame;
+	const int w = info[0].screen_width + info[1].screen_width;
+	for (int i = 0; i < 2; i++)
+	{
+		const int cw = info[i].screen_width, ch = info[i].screen_height;
+		const uint16_t *src = g_inst[i].frame_buffer;
+		for (int y = 0; y < h; y++)
+			for (int c = 0; c < cw; c++)
+				dst[y * w + x + c] = y < ch ? bgra565(src[y * cw + c]) : 0xFF000000u;
+		x += cw;
+	}
+	g_vwidth = w;
+	g_vheight = h;
 }
 
 extern "C" {
@@ -551,10 +723,14 @@ ECL_EXPORT void FrameAdvance(uint64_t packed)
 		return;
 
 	/* Power, held, is the console switched off and on: the libretro core's
-	 * reset, which keeps the battery RAM */
+	 * reset, which keeps the battery RAM. The link machines restart both
+	 * consoles and plug the cable in again, as that core does. */
 	if (g_buttons[0])
 	{
-		g_core->ResetROMPreservingRAM(&g_config);
+		for (int i = 0; i < g_count; i++)
+			g_cores[i]->ResetROMPreservingRAM(&g_configs[i]);
+		if (g_link)
+			g_link->Reset();
 		apply_devices();
 	}
 
@@ -562,18 +738,30 @@ ECL_EXPORT void FrameAdvance(uint64_t packed)
 
 	g_inputRead = 0;
 	int count = 0;
-	g_core->RunToVBlank(g_frame, g_audio, &count, NULL, g_render != 0);
+	if (g_link)
+	{
+		g_link->RunFrame();
+		const s16 *mix = g_link->Audio(2, &count);
+		if (count > (int)(sizeof g_audio / sizeof g_audio[0])) count = (int)(sizeof g_audio / sizeof g_audio[0]);
+		if (count > 0)
+			memcpy(g_audio, mix, (size_t)count * sizeof(s16));
+		if (g_render)
+			compose_link_picture();
+	}
+	else
+	{
+		g_core->RunToVBlank(g_frame, g_audio, &count, NULL, g_render != 0);
+		if (g_render)
+		{
+			GS_RuntimeInfo info;
+			g_core->GetRuntimeInfo(info);
+			g_vwidth = info.screen_width;
+			g_vheight = info.screen_height;
+		}
+	}
 	if (count < 0) count = 0;
 	if (count > (int)(sizeof g_audio / sizeof g_audio[0])) count = (int)(sizeof g_audio / sizeof g_audio[0]);
 	g_nsamples = count / 2;
-
-	if (g_render)
-	{
-		GS_RuntimeInfo info;
-		g_core->GetRuntimeInfo(info);
-		g_vwidth = info.screen_width;
-		g_vheight = info.screen_height;
-	}
 }
 
 /* Turbo: while off the core draws no picture and is otherwise the machine
@@ -609,50 +797,57 @@ ECL_EXPORT void SetInputPollCallback(uint64_t fn)
 	g_inputPoll = (uintptr_t (*)(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t))(uintptr_t)fn;
 }
 
-/* ---- memory domains ---- */
+/* ---- memory domains: each console's, the second's named "P2 ..." ---- */
+static const char *const kDomainNames[2][5] = {
+	{ "Main RAM", "VRAM", "CRAM", "Cartridge RAM", "ROM" },
+	{ "P2 Main RAM", "P2 VRAM", "P2 CRAM", "P2 Cartridge RAM", "P2 ROM" },
+};
 static const char *memdom(int which, uint8_t **area, int64_t *size, int *writable)
 {
+	const int console = which / 5;
+	if (console >= g_count)
+		return NULL;
+	GearsystemCore *core = g_cores[console];
+	const char *name = kDomainNames[console][which % 5];
 	*writable = 1;
-	switch (which)
+	switch (which % 5)
 	{
 	case 0:
 		/* the console's RAM: 8 KiB at 0xC000, 1 KiB on an SG-1000 */
-		*area = g_core->GetMemory()->GetMemoryMap() + 0xC000;
-		*size = g_core->GetCartridge()->IsSG1000() ? 0x400 : 0x2000;
-		return "Main RAM";
+		*area = core->GetMemory()->GetMemoryMap() + 0xC000;
+		*size = core->GetCartridge()->IsSG1000() ? 0x400 : 0x2000;
+		return name;
 	case 1:
-		*area = g_core->GetVideo()->GetVRAM();
+		*area = core->GetVideo()->GetVRAM();
 		*size = 0x4000;
-		return "VRAM";
+		return name;
 	case 2:
 	{
-		Cartridge *c = g_core->GetCartridge();
+		Cartridge *c = core->GetCartridge();
 		if (c->IsSG1000())
 			return NULL; /* the TMS9918's colours are fixed */
-		*area = g_core->GetVideo()->GetCRAM();
+		*area = core->GetVideo()->GetCRAM();
 		*size = (c->IsGameGear() && !c->IsGameGearInSMSMode()) ? 0x40 : 0x20;
-		return "CRAM";
+		return name;
 	}
 	case 3:
 	{
-		MemoryRule *rule = g_core->GetMemory()->GetCurrentRule();
+		MemoryRule *rule = core->GetMemory()->GetCurrentRule();
 		if (!rule || rule->GetRamBanks() == NULL || rule->GetRamSize() == 0)
 			return NULL;
 		*area = rule->GetRamBanks();
 		*size = (int64_t)rule->GetRamSize();
-		return "Cartridge RAM";
+		return name;
 	}
-	case 4:
-		*area = g_core->GetCartridge()->GetROM();
-		*size = g_core->GetCartridge()->GetROMSize();
-		*writable = 0;
-		return "ROM";
 	default:
-		return NULL;
+		*area = core->GetCartridge()->GetROM();
+		*size = core->GetCartridge()->GetROMSize();
+		*writable = 0;
+		return name;
 	}
 }
 
-#define DOMAIN_KINDS 5
+#define DOMAIN_KINDS 10
 static int domain_slot(int i)
 {
 	int found = 0;
@@ -702,29 +897,45 @@ ECL_EXPORT int GetMemoryDomainWritable(int i)
 	return which >= 0 && memdom(which, &area, &size, &w) ? w : 0;
 }
 
-/* ---- save data: the cartridge's battery RAM, once the game has used it ---- */
-static MemoryRule *battery(void)
+/* ---- save data: each cartridge's battery RAM, once its game has used it:
+ * battery.sav (P1's), battery2.sav (P2's on the link machines) ---- */
+static MemoryRule *battery(int console)
 {
-	if (!g_inited) return NULL;
-	MemoryRule *rule = g_core->GetMemory()->GetCurrentRule();
+	if (!g_inited || console >= g_count) return NULL;
+	MemoryRule *rule = g_cores[console]->GetMemory()->GetCurrentRule();
 	if (!rule || !rule->PersistedRAM() || rule->GetRamBanks() == NULL || rule->GetRamSize() == 0)
 		return NULL;
 	return rule;
 }
-ECL_EXPORT int32_t GetSaveDataFileCount(void) { return battery() ? 1 : 0; }
-ECL_EXPORT const char *GetSaveDataFileName(int32_t i) { return i == 0 && battery() ? "battery.sav" : NULL; }
+static int savedata_console(int32_t i)
+{
+	int found = 0;
+	for (int c = 0; c < 2; c++)
+		if (battery(c) && found++ == i)
+			return c;
+	return -1;
+}
+ECL_EXPORT int32_t GetSaveDataFileCount(void)
+{
+	return (battery(0) ? 1 : 0) + (battery(1) ? 1 : 0);
+}
+ECL_EXPORT const char *GetSaveDataFileName(int32_t i)
+{
+	int c = savedata_console(i);
+	return c < 0 ? NULL : c == 0 ? "battery.sav" : "battery2.sav";
+}
 ECL_EXPORT int64_t GetSaveDataFileSize(int32_t i)
 {
-	MemoryRule *r = i == 0 ? battery() : NULL;
-	return r ? (int64_t)r->GetRamSize() : 0;
+	int c = savedata_console(i);
+	return c < 0 ? 0 : (int64_t)battery(c)->GetRamSize();
 }
 ECL_EXPORT const uint8_t *GetSaveDataFileBuffer(int32_t i)
 {
-	MemoryRule *r = i == 0 ? battery() : NULL;
-	return r ? r->GetRamBanks() : NULL;
+	int c = savedata_console(i);
+	return c < 0 ? NULL : battery(c)->GetRamBanks();
 }
 
-/* ---- the Z80's registers ---- */
+/* ---- the Z80's registers (P1's) ---- */
 static const char *const kRegNames[] = {
 	"AF", "BC", "DE", "HL", "AF'", "BC'", "DE'", "HL'", "IX", "IY", "SP", "PC", "I", "R", "IM", "IFF1", "IFF2",
 };

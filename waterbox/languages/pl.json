@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Brak ROM-u rozruchowego '%1' lub nie można go odczytać.",
+		"error.link_refused": "'%1' nie może używać kabla łączącego tej maszyny.",
 		"error.no_file": "Projekt nie zawiera pliku kartridża.",
 		"error.not_read": "Nie można odczytać '%1'.",
 		"error.rejected": "Gearsystem nie mógł wczytać '%1' jako kartridża.",
@@ -20,10 +21,12 @@
 		"option.full284": "Wszystkie strony (szerokość 284)",
 		"option.full320": "Wszystkie strony (szerokość 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (dwie konsole)",
 		"option.international": "Międzynarodowy",
 		"option.japan": "Japonia",
 		"option.left": "Lewe oko",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (dwie konsole)",
 		"option.no": "Nie",
 		"option.none": "Nic",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Układ dźwiękowy FM",
 		"setting.ym2413.about": "Jednostka dźwięku FM YM2413, której niektóre gry na Master System używają do muzyki. Wyłączone usuwa ją z maszyny. Jest częścią maszyny, więc film wymaga tej samej wartości.",
 		"slot.cart": "Kartridż",
+		"slot.cart2": "Kartridż gracza P2",
 		"slot.cart_gg.help": "ROM kartridża Game Gear. Kartridż Master System działa tu w trybie Master System konsoli Game Gear.",
+		"slot.cart_gg2.help": "ROM kartridża Game Gear gracza P2, dla konsoli po prawej.",
 		"slot.cart_sg.help": "ROM kartridża SG-1000, SG-1000 II lub Othello Multivision.",
 		"slot.cart_sms.help": "ROM kartridża Master System lub Mark III.",
+		"slot.cart_sms2.help": "ROM kartridża Mark III gracza P2, dla konsoli po prawej.",
 		"slot.savedata": "Zapisane dane",
-		"slot.savedata.help": "Podtrzymywana bateryjnie pamięć RAM kartridża w postaci zapisanej przez Eksport zapisanych danych (battery.sav), od której zacznie się gra. Zostaw puste, aby zacząć bez zapisu."
+		"slot.savedata.help": "Podtrzymywana bateryjnie pamięć RAM kartridża w postaci zapisanej przez Eksport zapisanych danych (battery.sav), od której zacznie się gra. Zostaw puste, aby zacząć bez zapisu.",
+		"slot.savedata2": "Zapisane dane gracza P2",
+		"slot.savedata2.help": "Podtrzymywana bateryjnie pamięć RAM kartridża gracza P2 w postaci zapisanej przez Eksport zapisanych danych (battery2.sav), od której się zacznie. Zostaw puste, aby zacząć bez zapisu."
 	}
 }

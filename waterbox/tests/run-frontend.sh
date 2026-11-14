@@ -59,12 +59,24 @@ report() { printf "%-26s %-6s %s\n" "$1" "$2" "$3"; case "$2" in PASS) ok=$((ok+
 printf "%-26s %-6s %s\n" "Test" "Result" "Detail"
 printf "%-26s %-6s %s\n" "----" "------" "------"
 
-# a project of one machine's test cartridge, with these settings (JSON)
+# a project of one machine's test cartridge, with these settings (JSON); a
+# link machine (ext gglink or m3link) gets the link cartridge in both slots
 make_project() { # tag ext settings: prints the project's path
 	local dir="$work/project.$1"
-	rm -rf "$dir" && mkdir -p "$dir" && cp "$work/roms/gstest.$2" "$dir/"
-	"$crun" --new-project "$dir/$1.chimeraProject" "$package" "$dir/gstest.$2" \
-		--settings "$3" > "$dir/make.log" 2>&1 && echo "$dir/$1.chimeraProject"
+	rm -rf "$dir" && mkdir -p "$dir"
+	case "$2" in
+	gglink|m3link)
+		local e=gg; [ "$2" = m3link ] && e=sms
+		# a project lists a file once: P2's cartridge is a copy under its own name
+		cp "$work/roms/gslink.$e" "$dir/"
+		cp "$work/roms/gslink.$e" "$dir/gslink2.$e"
+		"$crun" --new-project "$dir/$1.chimeraProject" "$package" --file "cart_$e=$dir/gslink.$e" \
+			--file "cart_${e}2=$dir/gslink2.$e" --settings "$3" > "$dir/make.log" 2>&1 && echo "$dir/$1.chimeraProject" ;;
+	*)
+		cp "$work/roms/gstest.$2" "$dir/"
+		"$crun" --new-project "$dir/$1.chimeraProject" "$package" "$dir/gstest.$2" \
+			--settings "$3" > "$dir/make.log" 2>&1 && echo "$dir/$1.chimeraProject" ;;
+	esac
 }
 
 # the window: the project, a job for frontend-ram.lua, its RAM in $work/<tag>.ram
@@ -86,15 +98,22 @@ native_ram() { # tag ext settings sys hold-indices
 	local tag="$1" ext="$2" settings="$3" sys="$4" hold="$5"
 	local wd="$work/native.$tag"
 	rm -rf "$wd"; mkdir -p "$wd"
-	cp "$work/roms/gstest.$ext" "$wd/"
-	printf '{"cart_%s":["gstest.%s"]}' "$sys" "$ext" > "$wd/slots"
+	case "$ext" in
+	gglink|m3link)
+		local e=gg; [ "$ext" = m3link ] && e=sms
+		cp "$work/roms/gslink.$e" "$wd/"
+		printf '{"cart_%s":["gslink.%s"],"cart_%s2":["gslink.%s"]}' "$e" "$e" "$e" "$e" > "$wd/slots" ;;
+	*)
+		cp "$work/roms/gstest.$ext" "$wd/"
+		printf '{"cart_%s":["gstest.%s"]}' "$sys" "$ext" > "$wd/slots" ;;
+	esac
 	printf '%s' "$settings" > "$wd/settings"
 	"$rn" "$wd" --sys "$sys" --frames "$frames" ${hold:+--hold "$hold"} \
 		--dump-domain "Main RAM" "$work/native.$tag.ram" > "$work/native.$tag.txt" 2>&1
 }
 
 # --- the machine the window builds must be the one the native build is ---
-for m in "sms sms SMS sms" "gg gg GG gg" "sg sg SG sg1000"; do
+for m in "sms sms SMS sms" "gg gg GG gg" "sg sg SG sg1000" "gglink gglink GGL ggLink" "m3link m3link M3L markIIILink"; do
 	read -r tag ext sysid system <<< "$m"
 	settings="{\"system\":\"$system\"}"
 	if ! native_ram "$tag" "$ext" "$settings" "$tag" ""; then
@@ -103,6 +122,15 @@ for m in "sms sms SMS sms" "gg gg GG gg" "sg sg SG sg1000"; do
 		report "$tag:frontend" FAIL "the window's run did not finish (see tests/work/$tag.log)"
 	elif cmp -s "$work/native.$tag.ram" "$work/$tag.ram"; then
 		report "$tag:frontend" PASS "$frames frames in the window, Main RAM identical to the native reference"
+		# a link machine: P1's RAM must also show what came over the cable
+		case "$tag" in gglink|m3link)
+			n="$(python3 -c "import sys; print(open(sys.argv[1],'rb').read()[0x114])" "$work/$tag.ram")"
+			if [ "${n:-0}" -gt 0 ]; then
+				report "$tag:cable" PASS "P1 received $n times from P2 over the cable in the window"
+			else
+				report "$tag:cable" FAIL "P1 received nothing over the cable in the window"
+			fi ;;
+		esac
 	else
 		report "$tag:frontend" FAIL "Main RAM differs from the native reference"
 	fi
@@ -139,7 +167,8 @@ else
 fi
 
 # --- the bindings the package ships are the window's when nobody changed them ---
-for m in "sms:Master System Controller:sms:SMS" "gg:Game Gear Controller:gg:GG" "sg:SG-1000 Controller:sg1000:SG"; do
+for m in "sms:Master System Controller:sms:SMS" "gg:Game Gear Controller:gg:GG" "sg:SG-1000 Controller:sg1000:SG" \
+	"gglink:Game Gear Link Controls:ggLink:GGL" "m3link:Mark III Link Controls:markIIILink:M3L"; do
 	IFS=: read -r ext name system sysid <<< "$m"
 	tag="keys.$ext"
 	if run_window "$tag" "$ext" "{\"system\":\"$system\"}" "$sysid" "" dump-controls.lua \

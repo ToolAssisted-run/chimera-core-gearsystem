@@ -1,41 +1,127 @@
 {
-  "_comment": "This file lists the kinds of file a project of this core can hold. Chimera's New Project window is built from it. The core is three machines and each takes its own cartridges, so each has its own slot, and only the slot of the chosen machine is shown (the exposedWhen conditions do this). The machine comes from the project, never from a file name. A project may also hold a save of the cartridge's battery RAM, as Export Save Data writes it, to start from.",
+  "_comment": "This file lists the kinds of file a project of this core can hold. Chimera's New Project window is built from it. The core is five machines; each takes its own cartridges, so each has its own slot, and only the slots of the chosen machine are shown (the exposedWhen conditions do this). The two link machines are two consoles in one, so they take a second cartridge (P2's, which may be the same file). The machine comes from the project, never from a file name. A project may also hold a save of each cartridge's battery RAM, as Export Save Data writes it, to start from.",
   "slots": [
     {
       "id": "cart_sms",
       "title": "slot.cart",
       "min": 1,
       "max": 1,
-      "formats": ["sms", "bin", "rom"],
+      "formats": [
+        "sms",
+        "bin",
+        "rom"
+      ],
       "help": "slot.cart_sms.help",
-      "exposedWhen": { "setting": "system", "is": "sms" }
+      "exposedWhen": {
+        "setting": "system",
+        "in": [
+          "sms",
+          "markIIILink"
+        ]
+      }
     },
     {
       "id": "cart_gg",
       "title": "slot.cart",
       "min": 1,
       "max": 1,
-      "formats": ["gg", "sms", "bin", "rom"],
+      "formats": [
+        "gg",
+        "sms",
+        "bin",
+        "rom"
+      ],
       "help": "slot.cart_gg.help",
-      "exposedWhen": { "setting": "system", "is": "gg" }
+      "exposedWhen": {
+        "setting": "system",
+        "in": [
+          "gg",
+          "ggLink"
+        ]
+      }
     },
     {
       "id": "cart_sg",
       "title": "slot.cart",
       "min": 1,
       "max": 1,
-      "formats": ["sg", "sc", "mv", "bin", "rom"],
+      "formats": [
+        "sg",
+        "sc",
+        "mv",
+        "bin",
+        "rom"
+      ],
       "help": "slot.cart_sg.help",
-      "exposedWhen": { "setting": "system", "is": "sg1000" }
+      "exposedWhen": {
+        "setting": "system",
+        "is": "sg1000"
+      }
+    },
+    {
+      "id": "cart_gg2",
+      "title": "slot.cart2",
+      "min": 1,
+      "max": 1,
+      "formats": [
+        "gg",
+        "bin",
+        "rom"
+      ],
+      "help": "slot.cart_gg2.help",
+      "exposedWhen": {
+        "setting": "system",
+        "is": "ggLink"
+      }
+    },
+    {
+      "id": "cart_sms2",
+      "title": "slot.cart2",
+      "min": 1,
+      "max": 1,
+      "formats": [
+        "sms",
+        "bin",
+        "rom"
+      ],
+      "help": "slot.cart_sms2.help",
+      "exposedWhen": {
+        "setting": "system",
+        "is": "markIIILink"
+      }
     },
     {
       "id": "savedata",
       "title": "slot.savedata",
       "min": 0,
       "max": 1,
-      "formats": ["sav"],
+      "formats": [
+        "sav"
+      ],
       "help": "slot.savedata.help",
-      "exposedWhen": { "not": { "setting": "system", "is": "sg1000" } }
+      "exposedWhen": {
+        "not": {
+          "setting": "system",
+          "is": "sg1000"
+        }
+      }
+    },
+    {
+      "id": "savedata2",
+      "title": "slot.savedata2",
+      "min": 0,
+      "max": 1,
+      "formats": [
+        "sav"
+      ],
+      "help": "slot.savedata2.help",
+      "exposedWhen": {
+        "setting": "system",
+        "in": [
+          "ggLink",
+          "markIIILink"
+        ]
+      }
     }
   ]
 }

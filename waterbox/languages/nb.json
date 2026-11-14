@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Oppstarts-ROM-en '%1' mangler eller kunne ikke leses.",
+		"error.link_refused": "'%1' kan ikke bruke denne maskinens linkkabel.",
 		"error.no_file": "Prosjektet inneholder ingen kassettfil.",
 		"error.not_read": "Kunne ikke lese '%1'.",
 		"error.rejected": "Gearsystem kunne ikke laste '%1' som kassett.",
@@ -20,10 +21,12 @@
 		"option.full284": "Alle sider (284 bred)",
 		"option.full320": "Alle sider (320 bred)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (to konsoller)",
 		"option.international": "Internasjonal",
 		"option.japan": "Japan",
 		"option.left": "Venstre øye",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (to konsoller)",
 		"option.no": "Nei",
 		"option.none": "Ingenting",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-lydbrikke",
 		"setting.ym2413.about": "FM-lydenheten YM2413, som noen Master System-spill bruker til musikken. Av tar den ut av maskinen. Den er en del av maskinen, så en film trenger samme verdi.",
 		"slot.cart": "Kassett",
+		"slot.cart2": "P2s kassett",
 		"slot.cart_gg.help": "ROM-en fra en Game Gear-kassett. En Master System-kassett her kjører i Game Gears Master System-modus.",
+		"slot.cart_gg2.help": "ROM-en fra P2s Game Gear-kassett, til konsollen til høyre.",
 		"slot.cart_sg.help": "ROM-en fra en SG-1000-, SG-1000 II- eller Othello Multivision-kassett.",
 		"slot.cart_sms.help": "ROM-en fra en Master System- eller Mark III-kassett.",
+		"slot.cart_sms2.help": "ROM-en fra P2s Mark III-kassett, til konsollen til høyre.",
 		"slot.savedata": "Lagrede data",
-		"slot.savedata.help": "Kassettens batteri-RAM slik Eksporter lagrede data skrev den (battery.sav), å starte spillet fra. La den stå tom for å starte uten lagring."
+		"slot.savedata.help": "Kassettens batteri-RAM slik Eksporter lagrede data skrev den (battery.sav), å starte spillet fra. La den stå tom for å starte uten lagring.",
+		"slot.savedata2": "P2s lagrede data",
+		"slot.savedata2.help": "Batteri-RAM-en i P2s kassett slik Eksporter lagrede data skrev den (battery2.sav), å starte fra. La den stå tom for å starte uten lagring."
 	}
 }

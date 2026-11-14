@@ -8,7 +8,7 @@
 #     sh waterbox/setup-guest.sh -m <miniBox> && ninja -C build/meson-guest core.wbx
 #
 # The source list is upstream's libretro core's (platforms/libretro/
-# Makefile.common) without libretro.cpp and libretro_link.cpp: the emulator
+# Makefile.common) without libretro.cpp: the emulator, its two-console link
 # and nothing of the desktop program, its debugger windows or its MCP server.
 # Both builds compile the SAME waterbox/cinterface.cpp; only emulibc.h
 # differs.
@@ -59,6 +59,7 @@ inc = include_directories(
   'waterbox',
   gs / 'src',
   gs / 'platforms/shared/dependencies/miniz',
+  gs / 'platforms/libretro',
 )
 
 core_sources = files(
@@ -109,6 +110,9 @@ core_sources = files(
   gs / 'src/audio/Blip_Buffer.cpp',
   gs / 'src/audio/Sms_Apu.cpp',
   gs / 'src/audio/Stereo_Buffer.cpp',
+  # upstream's scheduler for two linked consoles (its libretro core's), for
+  # the Game Gear Link and Mark III Link machines; nothing of libretro itself
+  gs / 'platforms/libretro/libretro_link.cpp',
   'waterbox/cinterface.cpp',
 )
 

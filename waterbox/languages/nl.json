@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "De opstart-ROM '%1' ontbreekt of kon niet worden gelezen.",
+		"error.link_refused": "'%1' kan de linkkabel van deze machine niet gebruiken.",
 		"error.no_file": "Het project bevat geen cartridgebestand.",
 		"error.not_read": "'%1' kon niet worden gelezen.",
 		"error.rejected": "Gearsystem kon '%1' niet als cartridge laden.",
@@ -20,10 +21,12 @@
 		"option.full284": "Alle kanten (284 breed)",
 		"option.full320": "Alle kanten (320 breed)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (twee consoles)",
 		"option.international": "Internationaal",
 		"option.japan": "Japan",
 		"option.left": "Linkeroog",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (twee consoles)",
 		"option.no": "Nee",
 		"option.none": "Niets",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM-geluidschip",
 		"setting.ym2413.about": "De FM-geluidseenheid YM2413, die sommige Master System-spellen voor hun muziek gebruiken. Uit haalt hem uit de machine. Het hoort bij de machine, dus een film heeft dezelfde waarde nodig.",
 		"slot.cart": "Cartridge",
+		"slot.cart2": "Cartridge van P2",
 		"slot.cart_gg.help": "De ROM van een Game Gear-cartridge. Een Master System-cartridge hier draait in de Master System-modus van de Game Gear.",
+		"slot.cart_gg2.help": "De ROM van de Game Gear-cartridge van P2, voor de rechterconsole.",
 		"slot.cart_sg.help": "De ROM van een SG-1000-, SG-1000 II- of Othello Multivision-cartridge.",
 		"slot.cart_sms.help": "De ROM van een Master System- of Mark III-cartridge.",
+		"slot.cart_sms2.help": "De ROM van de Mark III-cartridge van P2, voor de rechterconsole.",
 		"slot.savedata": "Opgeslagen gegevens",
-		"slot.savedata.help": "Het batterij-RAM van de cartridge zoals Opgeslagen gegevens exporteren het schreef (battery.sav), om het spel daarmee te beginnen. Laat het leeg om zonder opslag te beginnen."
+		"slot.savedata.help": "Het batterij-RAM van de cartridge zoals Opgeslagen gegevens exporteren het schreef (battery.sav), om het spel daarmee te beginnen. Laat het leeg om zonder opslag te beginnen.",
+		"slot.savedata2": "Opgeslagen gegevens van P2",
+		"slot.savedata2.help": "Het batterij-RAM van de cartridge van P2 zoals Opgeslagen gegevens exporteren het schreef (battery2.sav), om mee te beginnen. Laat het leeg om zonder opslag te beginnen."
 	}
 }

@@ -1,0 +1,42 @@
+diff --git a/platforms/libretro/libretro_link.cpp b/platforms/libretro/libretro_link.cpp
+index 3739ced..8082c30 100644
+--- a/platforms/libretro/libretro_link.cpp
++++ b/platforms/libretro/libretro_link.cpp
+@@ -37,6 +37,7 @@ LibretroLink::LibretroLink(LibretroInstance* instances, s8* vertical_latch, s8*
+     m_dpad_horizontal_latch = horizontal_latch;
+     m_save_path[0] = 0;
+     m_has_rom_identity = false;
++    m_protocol = LinkCableProtocolGearToGear;
+     memset(m_rom_hash, 0, sizeof(m_rom_hash));
+     memset(m_bootrom_hash, 0, sizeof(m_bootrom_hash));
+     memset(&m_runtime, 0, sizeof(m_runtime));
+@@ -87,7 +88,7 @@ void LibretroLink::Reset()
+     for (unsigned i = 0; i < 2; i++)
+     {
+         GearsystemCore* core = m_instances[i].core;
+-        core->SetLinkCableProtocol(LinkCableProtocolGearToGear, m_runtime.origin[i]);
++        core->SetLinkCableProtocol(m_protocol, m_runtime.origin[i]);
+         core->SetLinkCableTransportActive(true, m_runtime.origin[i]);
+     }
+ 
+diff --git a/platforms/libretro/libretro_link.h b/platforms/libretro/libretro_link.h
+index eca9c7f..56ad852 100644
+--- a/platforms/libretro/libretro_link.h
++++ b/platforms/libretro/libretro_link.h
+@@ -41,6 +41,8 @@ public:
+     LibretroLink(LibretroInstance* instances, s8* vertical_latch, s8* horizontal_latch);
+     ~LibretroLink();
+     void Reset();
++    /* Chimera: the cable Reset() plugs in; Gear-to-Gear unless told */
++    void SetProtocol(GS_LinkCable_Protocol protocol) { m_protocol = protocol; }
+     void RunFrame();
+     void Geometry(bool vertical, int selection, unsigned* width, unsigned* height);
+     const u16* Video(bool vertical, bool switched, int selection);
+@@ -91,6 +93,7 @@ private:
+     u32 m_rom_hash[2];
+     u32 m_bootrom_hash[2];
+     bool m_has_rom_identity;
++    GS_LinkCable_Protocol m_protocol;
+ };
+ 
+ #endif /* LIBRETRO_LINK_H */

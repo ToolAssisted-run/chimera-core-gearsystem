@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Η ROM εκκίνησης '%1' λείπει ή δεν διαβάστηκε.",
+		"error.link_refused": "Το '%1' δεν μπορεί να χρησιμοποιήσει το καλώδιο σύνδεσης αυτού του μηχανήματος.",
 		"error.no_file": "Το έργο δεν περιέχει αρχείο κασέτας.",
 		"error.not_read": "Δεν ήταν δυνατή η ανάγνωση του '%1'.",
 		"error.rejected": "Το Gearsystem δεν μπόρεσε να φορτώσει το '%1' ως κασέτα.",
@@ -20,10 +21,12 @@
 		"option.full284": "Όλες οι πλευρές (πλάτος 284)",
 		"option.full320": "Όλες οι πλευρές (πλάτος 320)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (δύο κονσόλες)",
 		"option.international": "Διεθνές",
 		"option.japan": "Ιαπωνία",
 		"option.left": "Αριστερό μάτι",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (δύο κονσόλες)",
 		"option.no": "Όχι",
 		"option.none": "Τίποτα",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Τσιπ ήχου FM",
 		"setting.ym2413.about": "Η μονάδα ήχου FM YM2413, που χρησιμοποιούν ορισμένα παιχνίδια Master System για τη μουσική τους. Το Ανενεργό την αφαιρεί από το μηχάνημα. Είναι μέρος του μηχανήματος, άρα μια ταινία χρειάζεται την ίδια τιμή.",
 		"slot.cart": "Κασέτα",
+		"slot.cart2": "Κασέτα του P2",
 		"slot.cart_gg.help": "Η ROM μιας κασέτας Game Gear. Μια κασέτα Master System εδώ τρέχει στη λειτουργία Master System του Game Gear.",
+		"slot.cart_gg2.help": "Η ROM της κασέτας Game Gear του P2, για τη δεξιά κονσόλα.",
 		"slot.cart_sg.help": "Η ROM μιας κασέτας SG-1000, SG-1000 II ή Othello Multivision.",
 		"slot.cart_sms.help": "Η ROM μιας κασέτας Master System ή Mark III.",
+		"slot.cart_sms2.help": "Η ROM της κασέτας Mark III του P2, για τη δεξιά κονσόλα.",
 		"slot.savedata": "Αποθηκευμένα δεδομένα",
-		"slot.savedata.help": "Η RAM με μπαταρία της κασέτας όπως τη έγραψε η Εξαγωγή αποθηκευμένων δεδομένων (battery.sav), για να ξεκινήσει το παιχνίδι από αυτή. Αφήστε το κενό για να ξεκινήσετε χωρίς αποθήκευση."
+		"slot.savedata.help": "Η RAM με μπαταρία της κασέτας όπως τη έγραψε η Εξαγωγή αποθηκευμένων δεδομένων (battery.sav), για να ξεκινήσει το παιχνίδι από αυτή. Αφήστε το κενό για να ξεκινήσετε χωρίς αποθήκευση.",
+		"slot.savedata2": "Αποθηκευμένα δεδομένα του P2",
+		"slot.savedata2.help": "Η RAM με μπαταρία της κασέτας του P2 όπως την έγραψε η Εξαγωγή αποθηκευμένων δεδομένων (battery2.sav), για να ξεκινήσει από αυτή. Αφήστε το κενό για να ξεκινήσετε χωρίς αποθήκευση."
 	}
 }

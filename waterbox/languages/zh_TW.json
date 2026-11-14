@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "開機 ROM '%1' 遺失或無法讀取。",
+		"error.link_refused": "'%1' 無法使用這台機器的連線線。",
 		"error.no_file": "專案中沒有卡匣檔案。",
 		"error.not_read": "無法讀取 '%1'。",
 		"error.rejected": "Gearsystem 無法把 '%1' 當作卡匣載入。",
@@ -20,10 +21,12 @@
 		"option.full284": "四周（寬 284）",
 		"option.full320": "四周（寬 320）",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear 連線（兩台主機）",
 		"option.international": "國際版",
 		"option.japan": "日本",
 		"option.left": "左眼",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III 連線（兩台主機）",
 		"option.no": "否",
 		"option.none": "無",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "FM 音源晶片",
 		"setting.ym2413.about": "一些 Master System 遊戲用於音樂的 YM2413 FM 音源單元。關閉會把它從機器中移除。它是機器的一部分，所以影片需要相同的值。",
 		"slot.cart": "卡匣",
+		"slot.cart2": "P2 的卡匣",
 		"slot.cart_gg.help": "Game Gear 卡匣 ROM。放在這裡的 Master System 卡匣會在 Game Gear 的 Master System 模式下執行。",
+		"slot.cart_gg2.help": "P2 的 Game Gear 卡匣 ROM，用於右側的主機。",
 		"slot.cart_sg.help": "SG-1000、SG-1000 II 或 Othello Multivision 卡匣 ROM。",
 		"slot.cart_sms.help": "Master System 或 Mark III 卡匣 ROM。",
+		"slot.cart_sms2.help": "P2 的 Mark III 卡匣 ROM，用於右側的主機。",
 		"slot.savedata": "存檔資料",
-		"slot.savedata.help": "由「匯出存檔資料」寫出的卡匣電池 RAM（battery.sav），遊戲從它開始。留空則不帶存檔開始。"
+		"slot.savedata.help": "由「匯出存檔資料」寫出的卡匣電池 RAM（battery.sav），遊戲從它開始。留空則不帶存檔開始。",
+		"slot.savedata2": "P2 的存檔資料",
+		"slot.savedata2.help": "由「匯出存檔資料」寫出的 P2 卡匣電池 RAM（battery2.sav），從它開始。留空則不帶存檔開始。"
 	}
 }

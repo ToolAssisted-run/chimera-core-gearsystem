@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Falta la ROM d'arrencada '%1' o no s'ha pogut llegir.",
+		"error.link_refused": "'%1' no pot fer servir el cable d'enllaç d'aquesta màquina.",
 		"error.no_file": "El projecte no conté cap fitxer de cartutx.",
 		"error.not_read": "No s'ha pogut llegir '%1'.",
 		"error.rejected": "Gearsystem no ha pogut carregar '%1' com a cartutx.",
@@ -20,10 +21,12 @@
 		"option.full284": "Tots els costats (284 d'ample)",
 		"option.full320": "Tots els costats (320 d'ample)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (dues consoles)",
 		"option.international": "Internacional",
 		"option.japan": "Japó",
 		"option.left": "Ull esquerre",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (dues consoles)",
 		"option.no": "No",
 		"option.none": "Res",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Xip de so FM",
 		"setting.ym2413.about": "La unitat de so FM YM2413, que alguns jocs de Master System fan servir per a la música. Desactivat la treu de la màquina. Forma part de la màquina, així que una pel·lícula necessita el mateix valor.",
 		"slot.cart": "Cartutx",
+		"slot.cart2": "Cartutx de P2",
 		"slot.cart_gg.help": "La ROM d'un cartutx de Game Gear. Un cartutx de Master System aquí s'executa en el mode Master System de la Game Gear.",
+		"slot.cart_gg2.help": "La ROM del cartutx de Game Gear de P2, per a la consola de la dreta.",
 		"slot.cart_sg.help": "La ROM d'un cartutx de SG-1000, SG-1000 II o Othello Multivision.",
 		"slot.cart_sms.help": "La ROM d'un cartutx de Master System o Mark III.",
+		"slot.cart_sms2.help": "La ROM del cartutx de Mark III de P2, per a la consola de la dreta.",
 		"slot.savedata": "Dades desades",
-		"slot.savedata.help": "La RAM amb pila del cartutx tal com la va escriure Exporta les dades desades (battery.sav), per començar el joc des d'allà. Deixeu-ho buit per començar sense partida desada."
+		"slot.savedata.help": "La RAM amb pila del cartutx tal com la va escriure Exporta les dades desades (battery.sav), per començar el joc des d'allà. Deixeu-ho buit per començar sense partida desada.",
+		"slot.savedata2": "Dades desades de P2",
+		"slot.savedata2.help": "La RAM amb pila del cartutx de P2 tal com la va escriure Exporta les dades desades (battery2.sav), per començar des d'allà. Deixeu-ho buit per començar sense partida desada."
 	}
 }

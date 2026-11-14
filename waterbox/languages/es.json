@@ -1,6 +1,7 @@
 {
 	"texts": {
 		"error.bios_not_read": "Falta la ROM de arranque '%1' o no se pudo leer.",
+		"error.link_refused": "'%1' no puede usar el cable de enlace de esta máquina.",
 		"error.no_file": "El proyecto no contiene ningún archivo de cartucho.",
 		"error.not_read": "No se pudo leer '%1'.",
 		"error.rejected": "Gearsystem no pudo cargar '%1' como cartucho.",
@@ -20,10 +21,12 @@
 		"option.full284": "Todos los lados (284 de ancho)",
 		"option.full320": "Todos los lados (320 de ancho)",
 		"option.gg": "Game Gear",
+		"option.gglink": "Game Gear Link (dos consolas)",
 		"option.international": "Internacional",
 		"option.japan": "Japón",
 		"option.left": "Ojo izquierdo",
 		"option.lightphaser": "Light Phaser",
+		"option.markiiilink": "Mark III Link (dos consolas)",
 		"option.no": "No",
 		"option.none": "Nada",
 		"option.ntsc": "NTSC (60 Hz)",
@@ -72,10 +75,15 @@
 		"setting.ym2413": "Chip de sonido FM",
 		"setting.ym2413.about": "La unidad de sonido FM YM2413, que algunos juegos de Master System usan para su música. Desactivado la quita de la máquina. Forma parte de la máquina, así que una película necesita el mismo valor.",
 		"slot.cart": "Cartucho",
+		"slot.cart2": "Cartucho de P2",
 		"slot.cart_gg.help": "La ROM de un cartucho de Game Gear. Un cartucho de Master System aquí se ejecuta en el modo Master System de la Game Gear.",
+		"slot.cart_gg2.help": "La ROM del cartucho de Game Gear de P2, para la consola de la derecha.",
 		"slot.cart_sg.help": "La ROM de un cartucho de SG-1000, SG-1000 II u Othello Multivision.",
 		"slot.cart_sms.help": "La ROM de un cartucho de Master System o Mark III.",
+		"slot.cart_sms2.help": "La ROM del cartucho de Mark III de P2, para la consola de la derecha.",
 		"slot.savedata": "Datos guardados",
-		"slot.savedata.help": "La RAM con pila del cartucho tal como la escribió Exportar datos guardados (battery.sav), para empezar el juego desde ella. Déjelo vacío para empezar sin partida guardada."
+		"slot.savedata.help": "La RAM con pila del cartucho tal como la escribió Exportar datos guardados (battery.sav), para empezar el juego desde ella. Déjelo vacío para empezar sin partida guardada.",
+		"slot.savedata2": "Datos guardados de P2",
+		"slot.savedata2.help": "La RAM con pila del cartucho de P2 tal como la escribió Exportar datos guardados (battery2.sav), para empezar desde ella. Déjelo vacío para empezar sin partida guardada."
 	}
 }
