@@ -1,8 +1,8 @@
 {
   "package": "gearsystem",
-  "effectiveTerms": "GPL-3.0-or-later (Gearsystem), over MIT integration; see the note on the YM2413 emulation",
+  "effectiveTerms": "GPL-3.0-or-later (Gearsystem), with its YM2413 emulation under Genesis Plus GX terms (non-commercial), over MIT integration",
   "commercialUse": "prohibited",
-  "note": "The built core is Gearsystem (GPL-3.0-or-later) with this repository's MIT integration, Shay Green's sound buffers (GPL-2.0-or-later and LGPL-2.1-or-later) and miniz (MIT). Its YM2413 (FM sound) emulation is Jarek Burczynski's ym2413.c with Eke-Eke's changes from Genesis Plus GX; the file states no licence of its own, Genesis Plus GX ships it under its non-commercial terms, and MAME ships the original author's code under GPL-2.0-or-later. Until that is settled the package is marked as not for commercial use.",
+  "note": "The built core combines this repository's MIT integration with Gearsystem (GPL-3.0-or-later), Shay Green's sound buffers (GPL-2.0-or-later and LGPL-2.1-or-later) and miniz (MIT). Gearsystem's YM2413 (FM sound) emulation is Jarek Burczynski's ym2413.c with Eke-Eke's changes from Genesis Plus GX, whose code is free for NON-COMMERCIAL use only. The package as a whole therefore may not be redistributed commercially (owner's decision, 2026-11-14).",
   "components": [
     {
       "name": "chimera-core-gearsystem (integration)",
@@ -28,7 +28,7 @@
     },
     {
       "name": "YM2413 emulation (ym2413.c, Jarek Burczynski, changed for Genesis Plus GX by Eke-Eke), inside Gearsystem's src/audio/emu2413",
-      "license": "No licence stated in the file; see the package's note",
+      "license": "Genesis Plus GX licence (non-commercial), with MAME parts",
       "url": "https://github.com/drhelius/Gearsystem/tree/master/src/audio/emu2413",
       "commit": "{submodule:extern/Gearsystem}",
       "file": "extern/Gearsystem/src/audio/emu2413/emu2413.c"

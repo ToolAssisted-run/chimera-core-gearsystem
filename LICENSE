@@ -4,19 +4,21 @@ This repository is licensed as follows:
   (waterbox/, tests/, the build scripts, meson files and docs/) is under the
   MIT License below.
 
-- patches/ changes Gearsystem's source files and is under Gearsystem's
+- patches/ changes Gearsystem's source files (and its libretro link
+  scheduler) and is under Gearsystem's
   licence, the GNU General Public License version 3 or later.
 
 - Gearsystem (Ignacio Sanchez, https://github.com/drhelius/Gearsystem) is the
   submodule extern/Gearsystem, unchanged, under its own licence: GPL-3.0 or
   later (extern/Gearsystem/LICENSE). Some of its files carry their own
   terms: Shay Green's sound buffers (LGPL-2.1 or later, GPL-2.0 or later),
-  miniz (MIT), and a YM2413 emulation that states no licence of its own
-  (waterbox/package-licenses.json says what is known of it).
+  miniz (MIT), and a YM2413 (FM sound) emulation taken from Genesis Plus
+  GX, under Genesis Plus GX's terms: free for NON-COMMERCIAL use only.
 
 - THE BUILT CORE (core.wbx and the gearsystem.chimeraCore package) is
   Gearsystem with this repository's code compiled in, so it is passed on
-  under the GPL-3.0-or-later. Its source is this repository at the commit
+  under the GPL-3.0-or-later, and, for its YM2413 emulation, Genesis Plus
+  GX's terms: the package may not be redistributed commercially. Its source is this repository at the commit
   the package names, with Gearsystem at the commit the submodule names. The
   package carries every licence text (licenses/ inside it).
 
