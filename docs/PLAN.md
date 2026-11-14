@@ -169,6 +169,11 @@ sprite-collision or overflow timing. Real games are the test for those.
   RAM after 300 frames is the native reference's on all three machines,
   buttons held in the window reach the machine, `port1=none` reaches it, and
   the package's key bindings are the window's for all three controllers.
+  Its input test was seen to fail when the native reference held one of
+  the two buttons the window held.
+- 2026-11-14: from a fresh clone (submodule fetched at 40b8eeb), the build
+  and `run-gate.sh` give 37 passed, 0 failed, 3 skipped (the engine test
+  skips without CHIMERA_ROOT), and the package builds.
 - 2026-11-14: games from the owner's collection, copied into
   tests/roms-local on jaffanator01 (`run-local.sh`, 3600 frames each with
   the controls pressed in a fixed pseudo-random pattern): Prince of Persia
