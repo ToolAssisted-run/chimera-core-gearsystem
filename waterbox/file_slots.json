@@ -1,5 +1,5 @@
 {
-  "_comment": "This file lists the kinds of file a project of this core can hold. Chimera's New Project window is built from it. The core is five machines; each takes its own cartridges, so each has its own slot, and only the slots of the chosen machine are shown (the exposedWhen conditions do this). The two link machines are two consoles in one, so they take a second cartridge (P2's, which may be the same file). The machine comes from the project, never from a file name. A project may also hold a save of each cartridge's battery RAM, as Export Save Data writes it, to start from.",
+  "_comment": "This file lists the kinds of file a project of this core can hold. Chimera's New Project window is built from it. The core is five machines; each takes its own cartridges, so each has its own slot, and only the slots of the chosen machine are shown (the exposedWhen conditions do this). The two link machines are two consoles in one, so they take a second cartridge, P2's; with none, P2's console runs its own copy of P1's. The machine comes from the project, never from a file name. A project may also hold a save of each cartridge's battery RAM, as Export Save Data writes it, to start from.",
   "slots": [
     {
       "id": "cart_sms",
@@ -61,7 +61,7 @@
     {
       "id": "cart_gg2",
       "title": "slot.cart2",
-      "min": 1,
+      "min": 0,
       "max": 1,
       "formats": [
         "gg",
@@ -77,7 +77,7 @@
     {
       "id": "cart_sms2",
       "title": "slot.cart2",
-      "min": 1,
+      "min": 0,
       "max": 1,
       "formats": [
         "sms",

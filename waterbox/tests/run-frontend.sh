@@ -67,11 +67,11 @@ make_project() { # tag ext settings: prints the project's path
 	case "$2" in
 	gglink|m3link)
 		local e=gg; [ "$2" = m3link ] && e=sms
-		# a project lists a file once: P2's cartridge is a copy under its own name
+		# P2's slot left empty: P2's console runs its own copy of P1's
+		# cartridge (the native reference puts the file in both slots)
 		cp "$work/roms/gslink.$e" "$dir/"
-		cp "$work/roms/gslink.$e" "$dir/gslink2.$e"
 		"$crun" --new-project "$dir/$1.chimeraProject" "$package" --file "cart_$e=$dir/gslink.$e" \
-			--file "cart_${e}2=$dir/gslink2.$e" --settings "$3" > "$dir/make.log" 2>&1 && echo "$dir/$1.chimeraProject" ;;
+			--settings "$3" > "$dir/make.log" 2>&1 && echo "$dir/$1.chimeraProject" ;;
 	*)
 		cp "$work/roms/gstest.$2" "$dir/"
 		"$crun" --new-project "$dir/$1.chimeraProject" "$package" "$dir/gstest.$2" \

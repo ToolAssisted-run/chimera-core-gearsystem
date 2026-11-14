@@ -302,6 +302,26 @@ for m in "gglink gg ggLink 12" "m3link sms markIIILink 19"; do
 	else
 		report "$sys:crossing" FAIL "P2's button did not reach P1"
 	fi
+	# P2's slot empty: P2's console runs its own copy of P1's cartridge, the
+	# same machine as the same file in both slots, through native, sandbox
+	# and a save and load every frame, and the cable still carries bytes
+	ewd="$work/$sys.empty"; rm -rf "$ewd"; mkdir -p "$ewd"; cp "$work/roms/gslink.$ext" "$ewd/"
+	printf '{"cart_%s":["gslink.%s"]}' "$ext" "$ext" > "$ewd/slots"; printf '{"system":"%s"}' "$system" > "$ewd/settings"
+	if ! msg="$(equal_runs "$sys.empty" "$ewd" "${args[@]}")"; then
+		report "$sys:p2-empty" FAIL "$msg"
+	elif ! cmp -s "$work/$sys.box" "$work/$sys.empty.box"; then
+		report "$sys:p2-empty" FAIL "not the machine the same cartridge in both slots makes"
+	elif ! "$nat/run-wbx" "$gst/core.wbx" "$ewd" "${args[@]}" --rerecord 2>/dev/null | digests | cmp -s - "$work/$sys.empty.box"; then
+		report "$sys:p2-empty" FAIL "a save and a load before every frame changed the run"
+	else
+		"$nat/run-wbx" "$gst/core.wbx" "$ewd" --sys "$sys" --frames 300 --dump-domain "P2 Main RAM" "$work/le.ram" >/dev/null 2>&1
+		ne="$(ram_byte "$work/le.ram" 0x114 2>/dev/null)"
+		if [ "${ne:-0}" -gt 0 ]; then
+			report "$sys:p2-empty" PASS "no P2 cartridge: P2 runs P1's, native == sandbox == save and load every frame, P2 received $ne times"
+		else
+			report "$sys:p2-empty" FAIL "P2 received nothing over the cable"
+		fi
+	fi
 	if msg="$(equal_runs "$sys.power" "$wd" "${args[@]}" --power-at 300)" && ! cmp -s "$work/$sys.box" "$work/$sys.power.box"; then
 		report "$sys:power" PASS "Power at frame 300 restarts both consoles, native == sandbox"
 	else

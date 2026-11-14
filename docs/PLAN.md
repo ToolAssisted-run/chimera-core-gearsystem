@@ -233,9 +233,8 @@ was the model for the shape.
   Return). Memory domains are each console's, P2's named "P2 Main RAM" and
   so on. Save data: battery.sav and battery2.sav, and the slots `savedata`
   and `savedata2` to start from them.
-- **Files**: a second cartridge slot, `cart_gg2` or `cart_sms2`. A project
-  lists a file once, so playing the same game on both consoles takes a copy
-  under another name.
+- **Files**: a second cartridge slot, `cart_gg2` or `cart_sms2`, which may
+  be left empty (see the entry below).
 - **Settings**: shared by both consoles. A Game Gear Link runs its
   consoles natively (the cable is the native mode's) and refuses a
   cartridge that is not a Game Gear one; a Mark III Link is a Japanese
@@ -279,3 +278,22 @@ pattern (`run-local.sh --link`): native == sandbox == a save and load every
 frame. Columns, Sonic 2's two-player mode and F-16 Fighting Falcon were not
 tried: they are not on the machine. So no game has been played over the
 cable here; only the test cartridges prove the cable.
+
+## 2026-11-14: P2's cartridge may be left empty (user-decided, 2026-11-14)
+
+So that the Gear cores behave alike (the gearboy core's Link machine does
+this), a link project with no cartridge for P2 runs P1's on both consoles:
+P2's console reads its own copy of the file, and keeps its own saved data
+(`savedata2`). A project lists a file once, so before this the same game on
+both consoles took a renamed copy; now it takes nothing. A P2 cartridge, when
+given, is used as before. The slots `cart_gg2` and `cart_sms2` take 0 or 1
+file, and their help says so in all 26 languages.
+
+Measured: `run-gate.sh` 55 passed, 0 failed, 2 skipped. New test
+`<machine>:p2-empty` on both link machines: with P2's slot empty, native ==
+sandbox == a save and load before every frame, the machine is the one the
+same file in both slots makes, and P2 still receives over the cable (Game
+Gear 30 bytes, Mark III 143 reads, in 300 frames). Seen to fail with the
+fallback taken out (both machines: `error.no_file`). The window test now
+makes its link projects with P2's slot empty: 14 passed. Contract tests: 25
+passed.

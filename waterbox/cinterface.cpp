@@ -425,6 +425,10 @@ static int load_console(int i)
 	const char *file = i == 0 ? "rom" : NULL;
 	if (wbx_slot_count(slot) > 0 && wbx_slot_name(slot, 0, name, sizeof name) != NULL)
 		file = name;
+	/* a link machine with no cartridge for P2: P2's console runs its own
+	 * copy of P1's (as the Gearboy core's link does) */
+	else if (i == 1 && wbx_slot_count(cart_slot(0)) > 0 && wbx_slot_name(cart_slot(0), 0, name, sizeof name) != NULL)
+		file = name;
 	if (!file)
 	{
 		set_error("error.no_file", NULL);
